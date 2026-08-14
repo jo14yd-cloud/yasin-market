@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вафли и пирожные - ЯСИН</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .admin-mode [data-editable] {
+            cursor: pointer;
+            border: 1px dashed #f97316;
+            padding: 2px 4px;
+            border-radius: 6px;
+            background-color: #fff7ed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-28" id="bodyRoot">
+
+    <!-- 1. ШАПКА САЙТА И ПОИСК -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-md mx-auto flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <!-- Кнопка назад слева -->
+                <a href="index.html" class="font-bold text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-xl transition hover:bg-orange-100">← Назад</a>
+                
+                <!-- Название категории строго в конце (справа) -->
+                <h1 id="adminTrigger" onclick="checkAdminAccess()" class="font-bold text-lg text-gray-900 leading-tight cursor-pointer select-none">Вафли и пирожные 🍰</h1>
+
+                <div id="adminStatusBadge" class="hidden text-xs bg-emerald-500 text-white font-bold px-3 py-1 rounded-full">Админка ВКЛ</div>
+            </div>
+
+            <!-- Строка поиска -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="filterProducts()"
+                    placeholder="Быстрый поиск вафель и пирожных..." 
+                    class="w-full bg-gray-100 text-gray-800 text-sm rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+                >
+            </div>
+
+        </div>
+    </header>
+
+    <!-- 3. СКРЫТАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="adminPanel" class="hidden max-w-md mx-auto my-4 p-4 bg-white rounded-2xl shadow-md border border-orange-200">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-base text-orange-600">➕ Добавить новый товар</h2>
+            <button onclick="checkAdminAccess()" class="text-xs text-red-500 font-bold">Закрыть</button>
+        </div>
+        <form id="addProductForm" onsubmit="addProduct(event)" class="flex flex-col gap-3">
+            <input type="text" id="prodName" placeholder="Название товара" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodPrice" placeholder="Цена в сомах" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodOldPrice" placeholder="Старая цена (необязательно)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodVolume" placeholder="Фасовка / вес (например, 300г, 12шт)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodImage" placeholder="Ссылка на изображение (URL)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodDiscount" placeholder="Скидка (например, -10%)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition text-sm">Опубликовать товар</button>
+        </form>
+    </div>
+
+    <!-- 4. КАТАЛОГ ТОВАРОВ -->
+    <main class="max-w-md mx-auto p-4">
+        <h2 class="font-bold text-lg mb-3">Ассортимент</h2>
+        <div id="productsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Динамические товары -->
+        </div>
+    </main>
+
+    <!-- 5. НИЖНЯЯ ПЛАВАЮЩАЯ КОРЗИНА -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t flex flex-col items-center gap-1 z-40">
+        <a href="korzina.html" onclick="saveCartToStorage()" class="w-full max-w-md bg-yellow-400 hover:bg-yellow-500 font-bold py-3 px-5 rounded-2xl shadow-lg flex items-center justify-between transition text-gray-900">
+            <span id="cartSummaryText" class="text-base font-extrabold">0 сом</span>
+            <span class="flex items-center gap-2 text-sm">
+                Перейти в корзину 🛒
+            </span>
+        </a>
+    </div>
+
+    <!-- 6. СКРИПТЫ УПРАВЛЕНИЯ -->
+    <script>
+        // Актуальный список вафель и пирожных
+        let defaultProducts = [
+            { id: 1501, name: "ЯШКИНО ВАФЛИ С ХАЛВОЙ", price: 90, oldPrice: null, volume: "300г", image: "https://images.uzum.uz/ccv89erb3ho5lmuq16g0/original.jpg", discount: null },
+            { id: 1502, name: "ЯШКИНО ВАФЛИ СЛИВОЧНЫЙ", price: 90, oldPrice: null, volume: "300г", image: "https://bahetle-sib.ru/storage/goods/13574_FZ1y3.jpg", discount: null },
+            { id: 1503, name: "ЯШКИНО ВАФЛИ С ХАЛВОЙ", price: 60, oldPrice: null, volume: "200г", image: "https://bahetle-sib.ru/storage/goods/18268_HNjtO.jpg", discount: null },
+            { id: 1504, name: "ЯШКИНО ВАФЛИ СЛИВОЧНЫЙ", price: 60, oldPrice: null, volume: "200г", image: "https://api.kdvonline.kz/thumbnail/740x740/11/124/11124.png", discount: null },
+            { id: 1505, name: "СЛАДЕНЕЖ", price: 90, oldPrice: null, volume: "300г", image: "https://buy.am/media/image/a5/7a/43/carrefour33_0033_67408.webp", discount: null },
+            { id: 1506, name: "СЛАДЕНЕЖ", price: 50, oldPrice: null, volume: "200г", image: "https://gorilka.ru/upload/iblock/b6f/9bvzn0rudcvphxng6nrx6r4iyg5llb31.jpg", discount: null },
+            { id: 1507, name: "КОРОВКА", price: 120, oldPrice: null, volume: "300г", image: "https://avatars.mds.yandex.net/get-mpic/1859594/img_id8217123982165444969.jpeg/orig", discount: null },
+            { id: 1508, name: "КОРОВКА", price: 65, oldPrice: null, volume: "150г", image: "https://dixy.ru/upload/iblock/df6/tv48ui3rk5memwcpj44a4btm6yitchtk.webp", discount: null },
+            { id: 1509, name: "ROSHEN ВАФЛИ ШОКОЛАДНЫЙ", price: 95, oldPrice: null, volume: "216г", image: "https://avatars.mds.yandex.net/i?id=e7058455224de4dabc1f123e21f60702_l-5234092-images-thumbs&n=13", discount: null },
+            { id: 1510, name: "ROSHEN ВАФЛИ СЛИВОЧНЫЙ", price: 95, oldPrice: null, volume: "216г", image: "https://resources.cdn-kaspi.kz/img/m/p/h9f/hec/86298220101662.jpg?format=gallery-large", discount: null },
+            { id: 1511, name: "ЯШКИНО ВАФЛИ МЯГКИЙ", price: 60, oldPrice: null, volume: "120г", image: "https://main-cdn.sbermegamarket.ru/big2/hlr-system/-10/327/277/599/418/37/100024383066b0.jpg", discount: null },
+            { id: 1512, name: "ЯШКИНО РУЛЕТ", price: 75, oldPrice: null, volume: "200г", image: "https://imageproxy.wolt.com/menu/menu-images/67ea3bc39886f5cad91d069b/aed4f3d2-2733-11f0-8f94-1647d922fd96_4603290005524.jpg", discount: null },
+            { id: 1513, name: "ЯШКИНО ГОЛАНДСКИЙ", price: 75, oldPrice: null, volume: "290г", image: "https://avatars.mds.yandex.net/i?id=5f549c183cfc9d46bbb7c9f0a8425f45_l-5281109-images-thumbs&n=13", discount: null },
+            { id: 1514, name: "ROSHEN LOVITA ШОКОЛАДНЫЙ", price: 75, oldPrice: null, volume: "300г", image: "https://avatars.mds.yandex.net/i?id=a83251260a0e9d26ce40134296690a3782fbd969-9231626-images-thumbs&n=13", discount: null },
+            { id: 1515, name: "ROSHEN LOVITA СЛИВОЧНЫЙ", price: 75, oldPrice: null, volume: "300г", image: "https://a.allegroimg.com/original/112f12/d04e65634662ab4703eecfed5533/Ciasteczka-kruche-z-orzeszkami-ziemnymi-Lovita-Classic-Roshen-150g", discount: null },
+            { id: 1516, name: "MOON CAKE ШОКОЛАДНЫЙ", price: 100, oldPrice: null, volume: "1шт", image: "https://dixy.ru/upload/iblock/a03/1lsit6o9yt0evn932q2q3hd4jyib10jf.webp", discount: null },
+            { id: 1517, name: "MOON CAKE", price: 100, oldPrice: null, volume: "1шт", image: "https://dixy.ru/upload/iblock/f68/tgzzxn4glg99ahz6z6snxogse2fdbi3o.webp", discount: null },
+            { id: 1518, name: "ВАФЕЛЬНЫЙ ПЛОМБИР ШОКОЛАДНЫЙ", price: 170, oldPrice: null, volume: "400г", image: "https://cdn.bigmart.uz/file/hub/file/2025/3/24/2uke6wHGAIZf27B288kfXuJfQv6.jpg", discount: null },
+            { id: 1519, name: "ВАФЕЛЬНЫЙ ПЛОМБИР МИКС", price: 170, oldPrice: null, volume: "400г", image: "https://avatars.mds.yandex.net/i?id=0ebd71a3c9bcb146e05341d2b883b16867c7d195-12803022-images-thumbs&n=13", discount: null },
+            { id: 1520, name: "ВАФЕЛЬНЫЙ ПЛОМБИР СЛИВОЧНЫЙ", price: 170, oldPrice: null, volume: "400г", image: "https://basket-15.wbbasket.ru/vol2317/part231776/231776001/images/big/1.webp", discount: null },
+            { id: 1521, name: "ALBENI ROUND", price: 300, oldPrice: null, volume: "1шт", image: "https://grandbazar.su/wp-content/uploads/2023/10/pechene-albene-320-ulker.jpg", discount: null },
+            { id: 1522, name: "FORSITE ФУНДУК", price: 75, oldPrice: null, volume: "220г", image: "https://i0.wp.com/simvol-shop.ru/wp-content/uploads/2021/09/2ca72671113c11ecbb35b42e99f62130_fe880a5e3d6311ecbb85b42e99f62130.jpg?fit=700%2C700&ssl=1", discount: null },
+            { id: 1523, name: "FORSITE МОЛОЧНЫЙ", price: 75, oldPrice: null, volume: "220г", image: "https://goods-photos.static1-sima-land.com/items/6740762/0/1600.jpg?v=1684920615", discount: null },
+            { id: 1524, name: "TODAY КРУАСАН", price: 160, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/i?id=fa31e0d4c5c42a4754e3ddcfd19810982541fcc8-17844354-images-thumbs&n=13", discount: null },
+            { id: 1525, name: "KETLER КРУАСАН", price: 160, oldPrice: null, volume: "1шт", image: "https://s.optlist.ru/i/60/62/162ec4f27989c18f-6062-1.jpg", discount: null },
+            { id: 1526, name: "APELLA", price: 190, oldPrice: null, volume: "12шт", image: "https://avatars.mds.yandex.net/i?id=0bbde97bd131074291bbf9007785f7ec_l-5432883-images-thumbs&ref=rim&n=13&w=458&h=458", discount: null },
+            { id: 1527, name: "CHOCO PIE", price: 180, oldPrice: null, volume: "12шт", image: "https://avatars.mds.yandex.net/i?id=da9a2eb89644916abd6a42010fa2fb62_l-5283698-images-thumbs&n=13", discount: null },
+            { id: 1528, name: "TONDI", price: 100, oldPrice: null, volume: "6шт", image: "https://ir.ozone.ru/s3/multimedia-x/6884821905.jpg", discount: null },
+            { id: 1529, name: "CHOCO PIE ЯШКИНО", price: 100, oldPrice: null, volume: "6шт", image: "https://irecommend.ru/sites/default/files/imagecache/copyright1/user-images/2556001/1QDdrLptaqwcHGqwQpKMjg.jpeg", discount: null },
+            { id: 1530, name: "БУРЕНКА", price: 100, oldPrice: null, volume: "1шт", image: "https://i2017.otzovik.com/2017/01/18/4366848/img/78598668.jpeg", discount: null },
+            { id: 1531, name: "БОНДИ", price: 100, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/get-mpic/11520282/2a0000018ca6a2c1366ec5c24e7ab9b2437f/orig", discount: null },
+            { id: 1532, name: "ПИРОЖЕННОЕ", price: 120, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/i?id=6d5bdad1c84b6c6e9ab57b0c9115fe07_l-13202504-images-thumbs&n=13", discount: null },
+            { id: 1533, name: "TODAY", price: 160, oldPrice: null, volume: "1шт", image: "https://magnumopt.kz/upload/iblock/bef/bef16b556f7de9f00ab394e677038198.png", discount: null },
+            { id: 1534, name: "ЯШКИНО ПРЯНИК", price: 100, oldPrice: null, volume: "350г", image: "https://avatars.mds.yandex.net/i?id=328201c747c4825ed0165c3b4910d680151f4758-9233745-images-thumbs&n=13", discount: null },
+            { id: 1535, name: "ЯШКИНО КРУАСАН", price: 100, oldPrice: null, volume: "180г", image: "https://avatars.mds.yandex.net/i?id=6c788985237dec15b956e15dd320d224_l-8206955-images-thumbs&n=13", discount: null },
+            { id: 1536, name: "APACHI", price: 100, oldPrice: null, volume: "1шт", image: "https://tovar.uz/images/company/6865/tovar/129551/o_3_696a1b8a79cf0.webp", discount: null },
+            { id: 1537, name: "HAZEL", price: 110, oldPrice: null, volume: "1шт", image: "https://dixy.ru/upload/iblock/af1/2vs4b9xlgax5phh5tpdairmuxxjx24xv.webp", discount: null },
+            { id: 1538, name: "DEYA ВАФЛИ", price: 80, oldPrice: null, volume: "1шт", image: "https://images.uzum.uz/cvnsb15pb7fbmqmmc5hg/original.jpg", discount: null },
+            { id: 1539, name: "ПАЛОЧКИ ШОКОЛАДНЫЕ", price: 20, oldPrice: null, volume: "50г", image: "https://basket-10.wbbasket.ru/vol1463/part146380/146380408/images/big/1.webp", discount: null },
+            { id: 1540, name: "ЯШКИНО МИНИ ВАФЛИ", price: 20, oldPrice: null, volume: "1шт", image: "https://allo-spb.alltrades.ru/images/shop_items/36000.jpg.webp", discount: null },
+            { id: 1541, name: "KETLER МИНИ КРУАСАН", price: 20, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/i?id=163613a15f4045c7dfd9b395c0cb94b9_l-10837594-images-thumbs&n=13", discount: null },
+            { id: 1542, name: "СУПЕР КОНТИК", price: 45, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/get-mpic/4080967/2a00000190c0ee2d4e9947daee911fa8f3cd/orig", discount: null }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('shop_products_wafers')) || defaultProducts;
+        let clickCount = 0;
+        let isAdminActive = false;
+        let cart = JSON.parse(localStorage.getItem('asia_cart')) || {};
+
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        };
+
+        function saveCartToStorage() {
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
+        }
+
+        // Вход в админку по 5 кликам
+        function checkAdminAccess() {
+            clickCount++;
+            if (clickCount >= 5) {
+                clickCount = 0;
+                const password = prompt("Введите пароль администратора:");
+                if (password === "484831") {
+                    isAdminActive = !isAdminActive;
+                    const panel = document.getElementById('adminPanel');
+                    const badge = document.getElementById('adminStatusBadge');
+                    const body = document.getElementById('bodyRoot');
+
+                    if (isAdminActive) {
+                        panel.classList.remove('hidden');
+                        badge.classList.remove('hidden');
+                        body.classList.add('admin-mode');
+                        alert("🔓 Админка включена! Теперь можно удалять товары крестиком и изменять их данные.");
+                    } else {
+                        panel.classList.add('hidden');
+                        badge.classList.add('hidden');
+                        body.classList.remove('admin-mode');
+                    }
+                    renderProducts();
+                } else if (password !== null) {
+                    alert("❌ Неверный пароль!");
+                }
+            }
+        }
+
+        function renderProducts(itemsToRender = products) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            itemsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between relative product-card";
+                card.setAttribute('data-name', product.name.toLowerCase());
+                
+                let currentQty = cart[product.id] ? cart[product.id].qty : 0;
+
+                card.innerHTML = `
+                    ${product.discount ? `<span class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full z-10">${product.discount}</span>` : ''}
+                    
+                    <!-- Кнопка удаления для админа -->
+                    <button onclick="deleteProduct(${product.id})" class="admin-only ${isAdminActive ? '' : 'hidden'} absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center z-20 shadow font-bold">✕</button>
+
+                    <div class="relative w-full h-32 mb-2 flex items-center justify-center bg-gray-50 rounded-xl overflow-hidden">
+                        <img src="${product.image}" alt="${product.name}" class="max-h-full object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/300?text=Нет+фото';" ${isAdminActive ? `onclick="editProduct(${product.id}, 'image')" title="Кликните для смены картинки"` : ''}>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-base text-gray-900" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'price')"` : ''}>${product.price} сом</span>
+                            ${product.oldPrice ? `<span class="text-xs text-gray-400 line-through">${product.oldPrice} сом</span>` : ''}
+                        </div>
+                        <h3 class="text-xs text-gray-700 line-clamp-2 mt-1" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'name')"` : ''}>${product.name}</h3>
+                        <p class="text-[10px] text-gray-400 mt-0.5">${product.volume}</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-end mt-3">
+                        <div id="control-${product.id}">
+                            ${currentQty === 0 ? `
+                                <button onclick="changeQuantity(${product.id}, 1)" class="bg-gray-100 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition text-gray-800 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            ` : `
+                                <div class="flex items-center gap-1 bg-orange-500 text-white rounded-xl px-2 py-1 shadow-sm">
+                                    <button onclick="changeQuantity(${product.id}, -1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">-</button>
+                                    <span class="text-xs font-bold px-1">${currentQty}</span>
+                                    <button onclick="changeQuantity(${product.id}, 1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">+</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Управление количеством в корзине
+        function changeQuantity(id, delta) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (!cart[id]) {
+                cart[id] = { name: product.name, price: product.price, volume: product.volume, qty: 0 };
+            }
+
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) {
+                delete cart[id];
+            }
+
+            renderProducts();
+            updateCartUI();
+            saveCartToStorage();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                totalCount += cart[id].qty;
+                totalPrice += cart[id].qty * cart[id].price;
+            }
+
+            let summaryElement = document.getElementById('cartSummaryText');
+            if (totalCount > 0) {
+                summaryElement.innerText = `${totalCount} тов. • ${totalPrice} сом`;
+            } else {
+                summaryElement.innerText = '0 сом';
+            }
+        }
+
+        // Добавление товара через админку
+        function addProduct(event) {
+            event.preventDefault();
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('prodName').value,
+                price: Number(document.getElementById('prodPrice').value),
+                oldPrice: document.getElementById('prodOldPrice').value ? Number(document.getElementById('prodOldPrice').value) : null,
+                volume: document.getElementById('prodVolume').value,
+                image: document.getElementById('prodImage').value,
+                discount: document.getElementById('prodDiscount').value || null
+            };
+
+            products.unshift(newProduct);
+            localStorage.setItem('shop_products_wafers', JSON.stringify(products));
+            
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            alert('✅ Товар успешно добавлен в каталог!');
+        }
+
+        // Удаление товара в админке
+        function deleteProduct(id) {
+            if (confirm('Удалить этот товар из каталога?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('shop_products_wafers', JSON.stringify(products));
+                if (cart[id]) {
+                    delete cart[id];
+                    updateCartUI();
+                    saveCartToStorage();
+                }
+                renderProducts();
+            }
+        }
+
+        // Редактирование товара по клику в админке
+        function editProduct(id, field) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (field === 'name') {
+                let newVal = prompt('Новое название товара:', product.name);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.name = newVal;
+                    if (cart[id]) cart[id].name = newVal;
+                }
+            } else if (field === 'price') {
+                let newVal = prompt('Новая цена в сомах:', product.price);
+                if (newVal !== null && !isNaN(newVal) && newVal.trim() !== '') {
+                    product.price = Number(newVal);
+                    if (cart[id]) cart[id].price = Number(newVal);
+                    updateCartUI();
+                }
+            } else if (field === 'image') {
+                let newVal = prompt('Новая ссылка на картинку:', product.image);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.image = newVal;
+                }
+            }
+
+            localStorage.setItem('shop_products_wafers', JSON.stringify(products));
+            saveCartToStorage();
+            renderProducts();
+        }
+
+        // Фильтрация (быстрый поиск)
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+    </script>
+</body>
+</html>

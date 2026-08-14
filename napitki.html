@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Напитки - ЯСИН</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .admin-mode [data-editable] {
+            cursor: pointer;
+            border: 1px dashed #f97316;
+            padding: 2px 4px;
+            border-radius: 6px;
+            background-color: #fff7ed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-28" id="bodyRoot">
+
+    <!-- 1. ШАПКА САЙТА И ПОИСК -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-md mx-auto flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <!-- Кнопка назад слева -->
+                <a href="index.html" class="font-bold text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-xl transition hover:bg-orange-100">← Назад</a>
+                
+                <!-- Название НАПИТКИ строго в конце (справа) -->
+                <h1 id="adminTrigger" onclick="checkAdminAccess()" class="font-bold text-lg text-gray-900 leading-tight cursor-pointer select-none">Напитки 🥤</h1>
+
+                <div id="adminStatusBadge" class="hidden text-xs bg-emerald-500 text-white font-bold px-3 py-1 rounded-full">Админка ВКЛ</div>
+            </div>
+
+            <!-- Строка поиска -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="filterProducts()"
+                    placeholder="Быстрый поиск напитков..." 
+                    class="w-full bg-gray-100 text-gray-800 text-sm rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+                >
+            </div>
+
+        </div>
+    </header>
+
+    <!-- 3. СКРЫТАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="adminPanel" class="hidden max-w-md mx-auto my-4 p-4 bg-white rounded-2xl shadow-md border border-orange-200">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-base text-orange-600">➕ Добавить новый товар</h2>
+            <button onclick="checkAdminAccess()" class="text-xs text-red-500 font-bold">Закрыть</button>
+        </div>
+        <form id="addProductForm" onsubmit="addProduct(event)" class="flex flex-col gap-3">
+            <input type="text" id="prodName" placeholder="Название товара" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodPrice" placeholder="Цена в сомах" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodOldPrice" placeholder="Старая цена (необязательно)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodVolume" placeholder="Упаковка / объем (например, 2л)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodImage" placeholder="Ссылка на изображение (URL)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodDiscount" placeholder="Скидка (например, -10%)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition text-sm">Опубликовать товар</button>
+        </form>
+    </div>
+
+    <!-- 4. КАТАЛОГ ТОВАРОВ -->
+    <main class="max-w-md mx-auto p-4">
+        <h2 class="font-bold text-lg mb-3">Ассортимент напитков</h2>
+        <div id="productsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Динамические товары -->
+        </div>
+    </main>
+
+    <!-- 5. НИЖНЯЯ ПЛАВАЮЩАЯ КОРЗИНА -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t flex flex-col items-center gap-1 z-40">
+        <a href="korzina.html" onclick="saveCartToStorage()" class="w-full max-w-md bg-yellow-400 hover:bg-yellow-500 font-bold py-3 px-5 rounded-2xl shadow-lg flex items-center justify-between transition text-gray-900">
+            <span id="cartSummaryText" class="text-base font-extrabold">0 сом</span>
+            <span class="flex items-center gap-2 text-sm">
+                Перейти в корзину 🛒
+            </span>
+        </a>
+    </div>
+
+    <!-- 6. СКРИПТЫ УПРАВЛЕНИЯ -->
+    <script>
+        // Полный список напитков по вашему шаблону
+        let defaultProducts = [
+            { id: 301, name: "COCA COLA 2л", price: 150, oldPrice: null, volume: "2л", image: "https://avatars.mds.yandex.net/get-eda/3596693/88fe8c511fe894c73f1b228ad77f79f7/orig", discount: null },
+            { id: 302, name: "COCA COLA 1,5л", price: 120, oldPrice: null, volume: "1,5л", image: "https://static.price.ru/images/models/802x802/prohladitelniy-napitok/coca-cola-gazirovanniy-napitok-1l/e271b7ae51718c11de54efdae4dbb624.JPEG", discount: null },
+            { id: 303, name: "COCA COLA 1л", price: 90, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/get-mpic/20316562/2a0000019e405d715d655ec4f14d1cb40adc/orig", discount: null },
+            { id: 304, name: "COCA COLA 0,5л", price: 55, oldPrice: null, volume: "0,5л", image: "https://ir.ozone.ru/s3/multimedia-1-t/10051175621.jpg", discount: null },
+            { id: 305, name: "FANTA 2л", price: 150, oldPrice: null, volume: "2л", image: "https://telegka82.ru/image/cache/catalog/category/bezalkogolnye-napitki/napitki/fanta-2l-1000x500.jpg", discount: null },
+            { id: 306, name: "FANTA 1,5л", price: 120, oldPrice: null, volume: "1,5л", image: "https://avatars.mds.yandex.net/get-eda/18644967/09d90a3fa0f05cf4a83b3885b39568ea/800x800nocrop", discount: null },
+            { id: 307, name: "FANTA 1л", price: 90, oldPrice: null, volume: "1л", image: "https://static.tildacdn.com/stor3461-6130-4762-b239-393331366166/18460669.jpg", discount: null },
+            { id: 308, name: "FANTA 0,5л", price: 55, oldPrice: null, volume: "0,5л", image: "https://imageproxy.wolt.com/assets/6808e31037ab058cca266851", discount: null },
+            { id: 309, name: "SPRITE 2л", price: 150, oldPrice: null, volume: "2л", image: "https://sokovoz.ru/_sh/49/4966.jpg", discount: null },
+            { id: 310, name: "SPRITE 1,5л", price: 120, oldPrice: null, volume: "1,5л", image: "https://ir.ozone.ru/s3/multimedia-1-6/7054007946.jpg", discount: null },
+            { id: 311, name: "SPRITE 1л", price: 90, oldPrice: null, volume: "1л", image: "https://cdn-kz14.foodpicasso.com/assets/2025/08/25/90543aea4b9aa6c42cb3b260e2dcec21---jpg_1000x_103c0_convert.jpg", discount: null },
+            { id: 312, name: "SPRITE 0,5л", price: 55, oldPrice: null, volume: "0,5л", image: "https://www.trapeza.by/images/big/b228876.jpg", discount: null },
+            { id: 313, name: "PEPSI 2л", price: 150, oldPrice: null, volume: "2л", image: "https://resources.cdn-kaspi.kz/img/m/p/p3e/p28/115023217.jpg?format=gallery-large", discount: null },
+            { id: 314, name: "PEPSI 1,5л", price: 120, oldPrice: null, volume: "1,5л", image: "https://avatars.mds.yandex.net/get-eda/3377781/c4bad5101269c07f519454a780bbe363/orig", discount: null },
+            { id: 315, name: "PEPSI 1л", price: 90, oldPrice: null, volume: "1л", image: "https://ir.ozone.ru/s3/multimedia-1-y/c1000/7293424282.jpg", discount: null },
+            { id: 316, name: "PEPSI 0,5л", price: 50, oldPrice: null, volume: "0,5л", image: "https://avatars.mds.yandex.net/get-mpic/20182328/2a0000019e88a920f2c01119b0a0a931602f/orig", discount: null },
+            { id: 317, name: "SALAM COLA 2л", price: 150, oldPrice: null, volume: "2л", image: "https://imageproxy.wolt.com/assets/695f5788d6ad22bd20859fb7", discount: null },
+            { id: 318, name: "SALAM COLA 1,5л", price: 100, oldPrice: null, volume: "1,5л", image: "https://avatars.mds.yandex.net/get-eda/17778899/60eb227c8cc4fe6d439a17aee7cbf6d7/800x800nocrop", discount: null },
+            { id: 319, name: "SALAM COLA 1л", price: 70, oldPrice: null, volume: "1л", image: "https://static.ayanmarket.kz/products/images/image_2025-12-22-11-39-14_4870001573300.png", discount: null },
+            { id: 320, name: "SALAM COLA 0,5л", price: 30, oldPrice: null, volume: "0,5л", image: "https://imageproxy.wolt.com/assets/69426f0e9d8a4f8dc49cca92", discount: null },
+            { id: 321, name: "GARDEN ГРУША 2л", price: 150, oldPrice: null, volume: "2л", image: "https://avatars.mds.yandex.net/i?id=6a7ed39e3ad06d608a4dc4ea4e1baa64_l-13309256-images-thumbs&n=13", discount: null },
+            { id: 322, name: "GARDEN ГРУША 1л", price: 100, oldPrice: null, volume: "1л", image: "https://semeiniy.kz/wa-data/public/shop/products/82/79/127982/images/39474/39474.700.jpg", discount: null },
+            { id: 323, name: "GARDEN БЕРЕЗА 1л", price: 100, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=c5bde0c5dee9244e57c44680b214f6a3fe64779c-4288981-images-thumbs&n=13", discount: null },
+            { id: 324, name: "MAXI ЧАЙ КЛУБНИКА 1л", price: 100, oldPrice: null, volume: "1л", image: "https://basket-05.wbbasket.ru/vol943/part94336/94336118/images/big/1.webp", discount: null },
+            { id: 325, name: "MAXI ЧАЙ МАЛИНА 1л", price: 100, oldPrice: null, volume: "1л", image: "https://imageproxy.wolt.com/assets/69426ed8d46911a61b7b1273", discount: null },
+            { id: 326, name: "MAXI ЧАЙ ЛИМОН 1л", price: 100, oldPrice: null, volume: "1л", image: "https://imageproxy.wolt.com/assets/68c0517c297a5dbae8b17622", discount: null },
+            { id: 327, name: "MAXI ЧАЙ ЛЕСНЫЕ ЯГОДЫ 1л", price: 100, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/get-eda/3507285/28da6ece6b994c749d067456b65f2968/orig", discount: null },
+            { id: 328, name: "FUSE TEA ПЕРСИК 1л", price: 85, oldPrice: null, volume: "1л", image: "https://img.fix-price.com/insecure/rs:fit:800:800/plain/bit/_marketplace/images/origin/a0/a016179a84241b1729031985bd5afef5.jpg", discount: null },
+            { id: 329, name: "FUSE TEA МАНГО РОМАШКА 1л", price: 85, oldPrice: null, volume: "1л", image: "https://imageproxy.wolt.com/assets/69ec28225e1dc651acc8d6a2", discount: null },
+            { id: 330, name: "FUSE TEA АНАНАС 1л", price: 85, oldPrice: null, volume: "1л", image: "https://imageproxy.wolt.com/assets/69ec28215e1dc651acc8d69c", discount: null },
+            { id: 331, name: "FUSE TEA АРБУЗ 1л", price: 85, oldPrice: null, volume: "1л", image: "https://resources.cdn-kaspi.kz/img/m/p/hb0/hb2/85741142900766.png?format=gallery-large", discount: null },
+            { id: 332, name: "FUSE TEA ПЕРСИК 0,5л", price: 55, oldPrice: null, volume: "0,5л", image: "https://ir.ozone.ru/s3/multimedia-1-v/6954056275.jpg", discount: null },
+            { id: 333, name: "FUSE TEA МАНГО РОМАШКА 0,5л", price: 55, oldPrice: null, volume: "0,5л", image: "https://imageproxy.wolt.com/assets/6a0c3dd47d51afe405ddfffc", discount: null },
+            { id: 334, name: "FUSE TEA АНАНАС 0,5л", price: 55, oldPrice: null, volume: "0,5л", image: "https://s.f.kz/prod/6273/6272217_1000.jpg", discount: null },
+            { id: 335, name: "FUSE TEA АРБУЗ 0,5л", price: 55, oldPrice: null, volume: "0,5л", image: "https://basket-42.wbbasket.ru/vol11134/part1113499/1113499649/images/big/1.webp", discount: null },
+            { id: 336, name: "AVA ORANGELO 1л", price: 70, oldPrice: null, volume: "1л", image: "https://vkusmart.vmv.kz/upload/iblock/6c3/fsk4o130lm20mueag69paogmsifrran0.png", discount: null },
+            { id: 337, name: "AVA CITRON 1л", price: 70, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=1607754191b857e89547e85c80e0a49e14716bd7-5242761-images-thumbs&n=13", discount: null },
+            { id: 338, name: "AVA GRANAT 1л", price: 70, oldPrice: null, volume: "1л", image: "https://vkusmart.vmv.kz/upload/iblock/508/cp0os04uqb99emd0lgl3yzgex4r2nzih.png", discount: null },
+            { id: 339, name: "ЛИМОНАД 1л", price: 70, oldPrice: null, volume: "1л", image: "https://ds.com.kg/uploads/f87f79d9-3f8c-49f5-84da-91b66a32aa01/ac90823a-5288-11f0-9711-000c290b801b.jpg", discount: null },
+            { id: 340, name: "СУЛТАН ЧАЙ ПЕРСИК 1л", price: 60, oldPrice: null, volume: "1л", image: "https://cdn2.may24.ru/upload/iblock/9ef/9ef62b67f71a10d1166e53ee43803df5.jpg", discount: null },
+            { id: 341, name: "СУЛТАН ЧАЙ ЛИМОН 1л", price: 60, oldPrice: null, volume: "1л", image: "https://static.tildacdn.com/stor3834-3135-4334-a439-383562643435/20562129.jpg", discount: null },
+            { id: 342, name: "НАТАХТАРИЙ ГРУША 1л", price: 140, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/get-mpic/4448948/img_id6960179106552067540.jpeg/orig", discount: null },
+            { id: 343, name: "НАТАХТАРИЙ МОЛОЧНЫЙ 1л", price: 140, oldPrice: null, volume: "1л", image: "https://dariarmenii.ru/thumb/2/4pvqv8PzCkgtr9verfeIMQ/750r750/d/img_8113.jpg", discount: null },
+            { id: 344, name: "НАТАХТАРИЙ ВИНОГРАД 1л", price: 140, oldPrice: null, volume: "1л", image: "https://metropolis-online.ru/upload/iblock/7bc/fytbl1f8tz5j40zw7nix5uaccd2w3i4i.png", discount: null },
+            { id: 345, name: "ASU КЛУБНИКА 1л", price: 50, oldPrice: null, volume: "1л", image: "https://vkusmart.vmv.kz/upload/iblock/747/z5h3sxt1g1ro23j1igtevuj5vetnpirh.png", discount: null },
+            { id: 346, name: "ASU ЛИМОН 1л", price: 50, oldPrice: null, volume: "1л", image: "https://magnumopt.kz/upload/iblock/b6d/b6d19871f787d8f9ef93dfddf7850ad4.jpg", discount: null },
+            { id: 347, name: "ASU ПЕРСИК 1л", price: 50, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=6425784649c992dea0a634fb3aca5946_l-5434889-images-thumbs&n=13", discount: null },
+            { id: 348, name: "ASU КЛУБНИКА 0,5л", price: 35, oldPrice: null, volume: "0,5л", image: "https://resources.cdn-kaspi.kz/img/m/p/h8d/h88/83746402140190.jpg?format=gallery-large", discount: null },
+            { id: 349, name: "ASU ЛИМОН 0,5л", price: 35, oldPrice: null, volume: "0,5л", image: "https://avatars.mds.yandex.net/i?id=b36cf1fca3c01af66dede69297e4b8e4_l-5269099-images-thumbs&n=13", discount: null },
+            { id: 350, name: "ASU ПЕРСИК 0,5л", price: 35, oldPrice: null, volume: "0,5л", image: "https://cdn1.ozone.ru/s3/multimedia-8/c600/6832411820.jpg", discount: null },
+            { id: 351, name: "PIALA КЛУБНИКА 1л", price: 70, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=ed95eebdaa63cdfdbd9ccba08983a7bc_l-5424921-images-thumbs&n=13", discount: null },
+            { id: 352, name: "PIALA ПЕРСИК 1л", price: 70, oldPrice: null, volume: "1л", image: "https://sladkond.ru/upload/iblock/75a/rieapq49nvux6b9ptk507yalcsejy16s/ebcc9091_3d0c_11f0_83d0_00155dcd6812_d254107c_3d13_11f0_83d0_00155dcd6812.jpeg", discount: null },
+            { id: 353, name: "PIALA ЛИМОН 1л", price: 70, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=51d8865fc07793e45abb159382757eab49b20155-9853960-images-thumbs&n=13", discount: null },
+            { id: 354, name: "RC COLA 1,5л", price: 100, oldPrice: null, volume: "1,5л", image: "https://image.globus.ru/web/20/76/4672076.jpg", discount: null },
+            { id: 355, name: "RC COLA 1л", price: 80, oldPrice: null, volume: "1л", image: "https://resources.cdn-kaspi.kz/img/m/p/p89/pab/76141645.jpg?format=gallery-large", discount: null },
+            { id: 356, name: "JUICE АПЕЛЬСИН 1л", price: 100, oldPrice: null, volume: "1л", image: "https://yastatic.net/avatars/get-grocery-goods-b2b/10241750/b5dbb11a-85ff-4404-88a3-75d6e0ae769c/300x300?webp=true", discount: null },
+            { id: 357, name: "JUICE ДЫНЯ 1л", price: 100, oldPrice: null, volume: "1л", image: "https://yastatic.net/avatars/get-grocery-goods-b2b/10241750/c5531a05-3f7c-415a-b203-1f673f1a8d59/300x300?webp=true", discount: null },
+            { id: 358, name: "JUICE ГРАНАТ 1л", price: 100, oldPrice: null, volume: "1л", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKdK19TGMloH9r2XgKiAHwKG7d5SzmbbQ8TQ&s", discount: null },
+            { id: 359, name: "JUICE СМОРОДИНА 1л", price: 100, oldPrice: null, volume: "1л", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHivs_7xYPecpNQHX8MYWy9MsxbUCyOmbqfg&s", discount: null },
+            { id: 360, name: "JUICE АПЕЛЬСИН 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://yastatic.net/avatars/get-grocery-goods-b2b/10241750/b5dbb11a-85ff-4404-88a3-75d6e0ae769c/300x300?webp=true", discount: null },
+            { id: 361, name: "JUICE ДЫНЯ 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://yastatic.net/avatars/get-grocery-goods-b2b/10241750/c5531a05-3f7c-415a-b203-1f673f1a8d59/300x300?webp=true", discount: null },
+            { id: 362, name: "JUICE ГРАНАТ 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKdK19TGMloH9r2XgKiAHwKG7d5SzmbbQ8TQ&s", discount: null },
+            { id: 363, name: "JUICE СМОРОДИНА 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHivs_7xYPecpNQHX8MYWy9MsxbUCyOmbqfg&s", discount: null },
+            { id: 364, name: "PIKO АПЕЛЬСИН 1л", price: 130, oldPrice: null, volume: "1л", image: "https://static.insales-cdn.com/images/products/1/2035/883525619/large_ecde715a-f8cf-c9a8-57d7-42c9a77b8641.jpeg", discount: null },
+            { id: 365, name: "PIKO ВИНОГРАД 1л", price: 130, oldPrice: null, volume: "1л", image: "https://cdn.shopify.com/s/files/1/0269/0183/9966/products/kb-piko-pulpy-grape-pet-1-0l-41818_1200x1200.png?v=1671171486", discount: null },
+            { id: 366, name: "PIKO АПЕЛЬСИН 0,5л", price: 85, oldPrice: null, volume: "0,5л", image: "https://semeiniy.kz/wa-data/public/shop/products/42/76/87642/images/24332/24332.970.jpg", discount: null },
+            { id: 367, name: "PIKO ВИНОГРАД 0,5л", price: 85, oldPrice: null, volume: "0,5л", image: "https://avatars.mds.yandex.net/i?id=902c1917257d522eb3924c389a929e2b_l-7765754-images-thumbs&n=13", discount: null },
+            { id: 368, name: "K+ 1л", price: 50, oldPrice: null, volume: "1л", image: "", discount: null },
+            { id: 369, name: "ДЮШЕС 1л", price: 40, oldPrice: null, volume: "1л", image: "https://ashlyanfu-msk.ru/wa-data/public/shop/products/60/00/60/images/153/153.970.jpg", discount: null },
+            { id: 370, name: "7 UP 1л", price: 75, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=243e766c8427ba1fae5df43e6df0fde3_l-3573407-images-thumbs&n=13", discount: null },
+            { id: 371, name: "MОХИТО КЛУБНИКА 0,5л", price: 30, oldPrice: null, volume: "0,5л", image: "https://bozorcom.ams3.cdn.digitaloceanspaces.com/media/filer_public/0a/1d/0a1d7cf8-0081-497a-a516-a303a98f674e/pride_05_l_moxito_klubnika.jpg", discount: null },
+            { id: 372, name: "MОХИТО ЛАЙМ 0,5л", price: 30, oldPrice: null, volume: "0,5л", image: "https://avatars.mds.yandex.net/get-eda/2394388/621484f0d17635ea85b73972099138cd/orig", discount: null },
+            { id: 373, name: "НАТУРА ПЕРСИК 0,5л", price: 50, oldPrice: null, volume: "0,5л", image: "https://public-bybuy.object.pscloud.io/2024/01/25/8055842afb1b7d73fac4f8f2ac13d6ac1f8236a1.png", discount: null },
+            { id: 374, name: "НАТУРА КЛУБНИКА 0,5л", price: 50, oldPrice: null, volume: "0,5л", image: "https://public-bybuy.object.pscloud.io/2024/01/25/9f8fc213fa7665fb55afa3c71d83d3a880ba07b4.png", discount: null },
+            { id: 375, name: "FLAVIS AНАР 1л", price: 110, oldPrice: null, volume: "1л", image: "https://apeti.ru/upload/resize_cache/iblock/d7a/n5dxjfneh6x2k6qth2t4zbrn6kjh069n/400_400_2/napitok_flavis_granatovyy_1_25_l.png", discount: null },
+            { id: 376, name: "FLAVIS ГРУША 1л", price: 110, oldPrice: null, volume: "1л", image: "https://kalinbaza.ru/image/cache/catalog/products/batch62/b62_049-700x700.jpg", discount: null },
+            { id: 377, name: "FLAVIS МАХИТО 1л", price: 110, oldPrice: null, volume: "1л", image: "https://images.uzum.uz/cq3tscj5qt1gj8de6mdg/original.jpg", discount: null },
+            { id: 378, name: "FLAVIS СМОРОДИНА 1л", price: 110, oldPrice: null, volume: "1л", image: "https://foodstarcity.ru/image/cache/edit/VWi37V1F9swCwkYICevO-120x120.jpg", discount: null },
+            { id: 379, name: "FLAVIS AНАР 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://cdn2.may24.ru/upload/iblock/53c/2sqgsdq3linmy2m8mhgz3webiau9u82t.jpg", discount: null },
+            { id: 380, name: "FLAVIS ГРУША 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://kalinbaza.ru/image/cache/catalog/products/batch62/b62_049-700x700.jpg", discount: null },
+            { id: 381, name: "FLAVIS МАХИТО 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://avatars.mds.yandex.net/get-eda/17773786/a5a1d4155b13467f984bab765cb1d978/M_height", discount: null },
+            { id: 382, name: "FLAVIS СМОРОДИНА 0,5л", price: 60, oldPrice: null, volume: "0,5л", image: "https://foodstarcity.ru/image/cache/edit/VWi37V1F9swCwkYICevO-120x120.jpg", discount: null }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('shop_products_napitki')) || defaultProducts;
+        let clickCount = 0;
+        let isAdminActive = false;
+        let cart = JSON.parse(localStorage.getItem('asia_cart')) || {};
+
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        };
+
+        function saveCartToStorage() {
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
+        }
+
+        // Вход в админку по 5 кликам
+        function checkAdminAccess() {
+            clickCount++;
+            if (clickCount >= 5) {
+                clickCount = 0;
+                const password = prompt("Введите пароль администратора ");
+                if (password === "484831") {
+                    isAdminActive = !isAdminActive;
+                    const panel = document.getElementById('adminPanel');
+                    const badge = document.getElementById('adminStatusBadge');
+                    const body = document.getElementById('bodyRoot');
+
+                    if (isAdminActive) {
+                        panel.classList.remove('hidden');
+                        badge.classList.remove('hidden');
+                        body.classList.add('admin-mode');
+                        alert("🔓 Админка включена! Теперь можно удалять товары крестиком и изменять их данные.");
+                    } else {
+                        panel.classList.add('hidden');
+                        badge.classList.add('hidden');
+                        body.classList.remove('admin-mode');
+                    }
+                    renderProducts();
+                } else if (password !== null) {
+                    alert("❌ Неверный пароль!");
+                }
+            }
+        }
+
+        function renderProducts(itemsToRender = products) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            itemsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between relative product-card";
+                card.setAttribute('data-name', product.name.toLowerCase());
+                
+                let currentQty = cart[product.id] ? cart[product.id].qty : 0;
+
+                card.innerHTML = `
+                    ${product.discount ? `<span class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full z-10">${product.discount}</span>` : ''}
+                    
+                    <!-- Кнопка удаления для админа -->
+                    <button onclick="deleteProduct(${product.id})" class="admin-only ${isAdminActive ? '' : 'hidden'} absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center z-20 shadow font-bold">✕</button>
+
+                    <div class="relative w-full h-32 mb-2 flex items-center justify-center">
+                        <img src="${product.image}" alt="${product.name}" class="max-h-full object-contain rounded-xl" ${isAdminActive ? `onclick="editProduct(${product.id}, 'image')" title="Кликните для смены картинки"` : ''}>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-base text-gray-900" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'price')"` : ''}>${product.price} сом</span>
+                            ${product.oldPrice ? `<span class="text-xs text-gray-400 line-through">${product.oldPrice} сом</span>` : ''}
+                        </div>
+                        <h3 class="text-xs text-gray-700 line-clamp-2 mt-1" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'name')"` : ''}>${product.name}</h3>
+                        <p class="text-[10px] text-gray-400 mt-0.5">${product.volume}</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-end mt-3">
+                        <div id="control-${product.id}">
+                            ${currentQty === 0 ? `
+                                <button onclick="changeQuantity(${product.id}, 1)" class="bg-gray-100 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition text-gray-800 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            ` : `
+                                <div class="flex items-center gap-1 bg-orange-500 text-white rounded-xl px-2 py-1 shadow-sm">
+                                    <button onclick="changeQuantity(${product.id}, -1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">-</button>
+                                    <span class="text-xs font-bold px-1">${currentQty}</span>
+                                    <button onclick="changeQuantity(${product.id}, 1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">+</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Управление количеством в корзине
+        function changeQuantity(id, delta) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (!cart[id]) {
+                cart[id] = { name: product.name, price: product.price, volume: product.volume, qty: 0 };
+            }
+
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) {
+                delete cart[id];
+            }
+
+            renderProducts();
+            updateCartUI();
+            saveCartToStorage();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                totalCount += cart[id].qty;
+                totalPrice += cart[id].qty * cart[id].price;
+            }
+
+            let summaryElement = document.getElementById('cartSummaryText');
+            if (totalCount > 0) {
+                summaryElement.innerText = `${totalCount} тов. • ${totalPrice} сом`;
+            } else {
+                summaryElement.innerText = '0 сом';
+            }
+        }
+
+        // Добавление товара через админку
+        function addProduct(event) {
+            event.preventDefault();
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('prodName').value,
+                price: Number(document.getElementById('prodPrice').value),
+                oldPrice: document.getElementById('prodOldPrice').value ? Number(document.getElementById('prodOldPrice').value) : null,
+                volume: document.getElementById('prodVolume').value,
+                image: document.getElementById('prodImage').value,
+                discount: document.getElementById('prodDiscount').value || null
+            };
+
+            products.unshift(newProduct);
+            localStorage.setItem('shop_products_napitki', JSON.stringify(products));
+            
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            alert('✅ Товар успешно добавлен в каталог!');
+        }
+
+        // Удаление товара в админке
+        function deleteProduct(id) {
+            if (confirm('Удалить этот товар из каталога?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('shop_products_napitki', JSON.stringify(products));
+                if (cart[id]) {
+                    delete cart[id];
+                    updateCartUI();
+                    saveCartToStorage();
+                }
+                renderProducts();
+            }
+        }
+
+        // Редактирование товара по клику в админке
+        function editProduct(id, field) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (field === 'name') {
+                let newVal = prompt('Новое название товара:', product.name);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.name = newVal;
+                    if (cart[id]) cart[id].name = newVal;
+                }
+            } else if (field === 'price') {
+                let newVal = prompt('Новая цена в сомах:', product.price);
+                if (newVal !== null && !isNaN(newVal) && newVal.trim() !== '') {
+                    product.price = Number(newVal);
+                    if (cart[id]) cart[id].price = Number(newVal);
+                    updateCartUI();
+                }
+            } else if (field === 'image') {
+                let newVal = prompt('Новая ссылка на картинку:', product.image);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.image = newVal;
+                }
+            }
+
+            localStorage.setItem('shop_products_napitki', JSON.stringify(products));
+            saveCartToStorage();
+            renderProducts();
+        }
+
+        // Фильтрация (быстрый поиск)
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+    </script>
+</body>
+</html>

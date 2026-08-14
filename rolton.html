@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лапша быстрого приготовления - ЯСИН</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .admin-mode [data-editable] {
+            cursor: pointer;
+            border: 1px dashed #f97316;
+            padding: 2px 4px;
+            border-radius: 6px;
+            background-color: #fff7ed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-28" id="bodyRoot">
+
+    <!-- 1. ШАПКА СТРАНИЦЫ -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-md mx-auto flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <a href="index.html" class="flex items-center gap-1 text-sm font-bold text-orange-500 hover:text-orange-600 transition">
+                    ← Назад
+                </a>
+                <!-- Клик 5 раз по заголовку открывает админку -->
+                <h1 id="adminTrigger" onclick="checkAdminAccess()" class="font-bold text-lg text-gray-900 leading-tight cursor-pointer select-none text-center">Лапша быстрого приготовления 🍜</h1>
+                <div id="adminStatusBadge" class="hidden text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">Админка ВКЛ</div>
+            </div>
+
+            <!-- Строка поиска по разделу -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="filterProducts()"
+                    placeholder="Поиск лапши..." 
+                    class="w-full bg-gray-100 text-gray-800 text-sm rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+                >
+            </div>
+
+        </div>
+    </header>
+
+    <!-- 2. СКРЫТАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="adminPanel" class="hidden max-w-md mx-auto my-4 p-4 bg-white rounded-2xl shadow-md border border-orange-200 mx-4">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-base text-orange-600">➕ Добавить новый товар</h2>
+            <button onclick="checkAdminAccess()" class="text-xs text-red-500 font-bold">Закрыть</button>
+        </div>
+        <form id="addProductForm" onsubmit="addProduct(event)" class="flex flex-col gap-3">
+            <input type="text" id="prodName" placeholder="Название (например, ДОШИРАК КРАСНЫЙ 90г)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodPrice" placeholder="Цена в сомах" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodOldPrice" placeholder="Старая цена (необязательно)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodVolume" placeholder="Вес / Фасовка (например, 90г)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodImage" placeholder="Ссылка на изображение (URL)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodDiscount" placeholder="Скидка (например, -10%)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition text-sm">Опубликовать товар</button>
+        </form>
+    </div>
+
+    <!-- 3. КАТАЛОГ ТОВАРОВ (ЛАПША) -->
+    <main class="max-w-md mx-auto p-4">
+        <h2 class="font-bold text-lg mb-3">Ассортимент лапши</h2>
+        <div id="productsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Динамические товары -->
+        </div>
+    </main>
+
+    <!-- 4. НИЖНЯЯ ПЛАВАЮЩАЯ КОРЗИНА -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t flex flex-col items-center gap-1 z-40">
+        <a href="korzina.html" onclick="saveCartToStorage()" class="w-full max-w-md bg-yellow-400 hover:bg-yellow-500 font-bold py-3 px-5 rounded-2xl shadow-lg flex items-center justify-between transition text-gray-900">
+            <span id="cartSummaryText" class="text-base font-extrabold">0 сом</span>
+            <span class="flex items-center gap-2 text-sm">
+                Перейти в корзину 🛒
+            </span>
+        </a>
+    </div>
+
+    <!-- 5. СКРИПТЫ УПРАВЛЕНИЯ -->
+    <script>
+        let clickCount = 0;
+        let isAdminActive = false;
+        let cart = JSON.parse(localStorage.getItem('asia_cart')) || {};
+
+        // Базовые товары для раздела «Лапша»
+        let noodleProducts = JSON.parse(localStorage.getItem('yasyn_noodle_products')) || [
+            { id: 1, name: "ДОШИРАК КРАСНЫЙ 90г", price: 60, oldPrice: null, volume: "90г", image: "https://avatars.mds.yandex.net/get-mpic/15426853/2a0000019817f230664806862dbf2c75cbc8/orig", discount: null },
+            { id: 2, name: "ДОШИRAK ЗЕЛЕННЫЙ 90г", price: 60, oldPrice: null, volume: "90г", image: "https://basket-39.wbbasket.ru/vol8826/part882625/882625903/images/big/1.webp", discount: null },
+            { id: 3, name: "РОЛТОН КОНТЕЙНЕР 90г", price: 60, oldPrice: null, volume: "90г", image: "https://imageproxy.wolt.com/assets/6837102099d5916e98a41bfc", discount: null },
+            { id: 4, name: "РОЛТОН 85г", price: 35, oldPrice: null, volume: "85г", image: "https://basket-25.wbbasket.ru/vol4385/part438553/438553359/images/big/1.webp", discount: null },
+            { id: 5, name: "РОЛТОН 60г", price: 20, oldPrice: null, volume: "60г", image: "https://avatars.mds.yandex.net/i?id=701f4b2ac9331ec49782f19ba01694ca7ee41a1b-4316446-images-thumbs&n=13", discount: null },
+            { id: 6, name: "БИГ БОН РОЛТОН КОНТЕЙНЕР 85г", price: 70, oldPrice: null, volume: "85г", image: "https://avatars.mds.yandex.net/i?id=c089ce75a9d8615fded556216b20f8c0_l-5241446-images-thumbs&ref=rim&n=13&w=700&h=700", discount: null },
+            { id: 7, name: "БИГ БОН РОЛТОН СИНИЙ 75г", price: 35, oldPrice: null, volume: "75г", image: "https://babymarket.uz/wp-content/uploads/2021/07/big-bon-govjadina-s-tomatnym-sousom-s-bazilikom-75g.jpg", discount: null },
+            { id: 8, name: "БИГ БОН РОЛТОН КРАСНЫЙ 75г", price: 35, oldPrice: null, volume: "75г", image: "https://avatars.mds.yandex.net/i?id=251c598f3a701d6cfa309675c481f53d4197fa02-9069268-images-thumbs&ref=rim&n=33&w=256&h=300", discount: null },
+            { id: 9, name: "БИГ БОН РОЛТОН ТОМ ЯН 85г", price: 35, oldPrice: null, volume: "85г", image: "https://avatars.mds.yandex.net/i?id=36cc4d32c106c20eb43838c235ddd021941c29f0-5870469-images-thumbs&n=13", discount: null },
+            { id: 10, name: "ПОВАРЕНОК 70г", price: 25, oldPrice: null, volume: "70г", image: "https://avatars.mds.yandex.net/i?id=4ac0847a13a7f84b314b98681813e5e7_l-5221353-images-thumbs&n=13", discount: null },
+            { id: 11, name: "ПОВАРЕНОК ОСТРЫЙ 70г", price: 25, oldPrice: null, volume: "70г", image: "https://backend.magnit.tj/uploads/images/38be580ccbb748cb2b5bc67a9e227e41-1024x1024.jpg", discount: null },
+            { id: 12, name: "АЛЬКОНИ ОСТРЫЙ 100г", price: 35, oldPrice: null, volume: "100г", image: "https://avatars.mds.yandex.net/i?id=a54b26a558159094f6d6cbe8ec33e1e04fd97fe9-9741045-images-thumbs&n=13", discount: null },
+            { id: 13, name: "АЛЬКОНИ 100г", price: 35, oldPrice: null, volume: "100г", image: "https://avatars.mds.yandex.net/i?id=9ed2b80f2a63e935338e4312114beaac4819a190-9609067-images-thumbs&n=13", discount: null },
+            { id: 14, name: "АЛЬКОНИ ОСТРЫЙ 80г", price: 30, oldPrice: null, volume: "80г", image: "https://basket-05.wbbasket.ru/vol959/part95936/95936663/images/big/1.webp", discount: null },
+            { id: 15, name: "АЛЬКОНИ 70г", price: 30, oldPrice: null, volume: "70г", image: "https://basket-05.wbbasket.ru/vol807/part80788/80788652/images/big/1.webp", discount: null },
+            { id: 16, name: "ЕВРО ЕКСПРЕС ГОВЯЖИЙ 60г", price: 25, oldPrice: null, volume: "60г", image: "https://app.willesden.by/images/4700000200375.jpg", discount: null },
+            { id: 17, name: "ЕВРО ЕКСПРЕС КУРИНЫЙ 60г", price: 25, oldPrice: null, volume: "60г", image: "https://imageproxy.wolt.com/assets/697ac7220b99e8267734b90f", discount: null }
+        ];
+
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        };
+
+        function saveCartToStorage() {
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
+        }
+
+        // Вход в админку по 5 кликам по названию страницы
+        function checkAdminAccess() {
+            clickCount++;
+            if (clickCount >= 5) {
+                clickCount = 0;
+                const password = prompt("Введите пароль администратора ");
+                if (password === "484831") {
+                    isAdminActive = !isAdminActive;
+                    const panel = document.getElementById('adminPanel');
+                    const badge = document.getElementById('adminStatusBadge');
+                    const body = document.getElementById('bodyRoot');
+
+                    if (isAdminActive) {
+                        panel.classList.remove('hidden');
+                        badge.classList.remove('hidden');
+                        body.classList.add('admin-mode');
+                        alert("🔓 Админка включена! Теперь можно удалять товары и изменять их по клику.");
+                    } else {
+                        panel.classList.add('hidden');
+                        badge.classList.add('hidden');
+                        body.classList.remove('admin-mode');
+                    }
+                    renderProducts();
+                } else if (password !== null) {
+                    alert("❌ Неверный пароль!");
+                }
+            }
+        }
+
+        function renderProducts(itemsToRender = noodleProducts) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            itemsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between relative product-card";
+                
+                let currentQty = cart[product.id] ? cart[product.id].qty : 0;
+
+                card.innerHTML = `
+                    ${product.discount ? `<span class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full z-10">${product.discount}</span>` : ''}
+                    
+                    <!-- Кнопка удаления для админа -->
+                    <button onclick="deleteProduct(${product.id})" class="admin-only ${isAdminActive ? '' : 'hidden'} absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center z-20 shadow font-bold">✕</button>
+
+                    <div class="relative w-full h-32 mb-2 flex items-center justify-center">
+                        <img src="${product.image}" alt="${product.name}" class="max-h-full object-contain rounded-xl" ${isAdminActive ? `onclick="editProduct(${product.id}, 'image')" title="Кликните для смены картинки"` : ''}>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-base text-gray-900" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'price')"` : ''}>${product.price} сом</span>
+                            ${product.oldPrice ? `<span class="text-xs text-gray-400 line-through">${product.oldPrice} сом</span>` : ''}
+                        </div>
+                        <h3 class="text-xs text-gray-700 line-clamp-2 mt-1" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'name')"` : ''}>${product.name}</h3>
+                        <p class="text-[10px] text-gray-400 mt-0.5">🍜 ${product.volume}</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-end mt-3">
+                        <div id="control-${product.id}">
+                            ${currentQty === 0 ? `
+                                <button onclick="changeQuantity(${product.id}, 1)" class="bg-gray-100 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition text-gray-800 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            ` : `
+                                <div class="flex items-center gap-1 bg-orange-500 text-white rounded-xl px-2 py-1 shadow-sm">
+                                    <button onclick="changeQuantity(${product.id}, -1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">-</button>
+                                    <span class="text-xs font-bold px-1">${currentQty}</span>
+                                    <button onclick="changeQuantity(${product.id}, 1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">+</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function changeQuantity(id, delta) {
+            let product = noodleProducts.find(p => p.id === id);
+            if (!product) return;
+
+            if (!cart[id]) {
+                cart[id] = { name: product.name, price: product.price, volume: product.volume, image: product.image, qty: 0 };
+            }
+
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) {
+                delete cart[id];
+            }
+
+            renderProducts();
+            updateCartUI();
+            saveCartToStorage();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                totalCount += cart[id].qty;
+                totalPrice += cart[id].qty * cart[id].price;
+            }
+
+            let summaryElement = document.getElementById('cartSummaryText');
+            if (totalCount > 0) {
+                summaryElement.innerText = `${totalCount} тов. • ${totalPrice} сом`;
+            } else {
+                summaryElement.innerText = '0 сом';
+            }
+        }
+
+        function addProduct(event) {
+            event.preventDefault();
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('prodName').value,
+                price: Number(document.getElementById('prodPrice').value),
+                oldPrice: document.getElementById('prodOldPrice').value ? Number(document.getElementById('prodOldPrice').value) : null,
+                volume: document.getElementById('prodVolume').value,
+                image: document.getElementById('prodImage').value,
+                discount: document.getElementById('prodDiscount').value || null
+            };
+
+            noodleProducts.unshift(newProduct);
+            localStorage.setItem('yasyn_noodle_products', JSON.stringify(noodleProducts));
+            
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            alert('✅ Товар успешно добавлен в каталог!');
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Удалить этот товар из каталога?')) {
+                noodleProducts = noodleProducts.filter(p => p.id !== id);
+                localStorage.setItem('yasyn_noodle_products', JSON.stringify(noodleProducts));
+                if (cart[id]) {
+                    delete cart[id];
+                    updateCartUI();
+                    saveCartToStorage();
+                }
+                renderProducts();
+            }
+        }
+
+        function editProduct(id, field) {
+            let product = noodleProducts.find(p => p.id === id);
+            if (!product) return;
+
+            if (field === 'name') {
+                let newVal = prompt('Новое название товара:', product.name);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.name = newVal;
+                    if (cart[id]) cart[id].name = newVal;
+                }
+            } else if (field === 'price') {
+                let newVal = prompt('Новая цена в сомах:', product.price);
+                if (newVal !== null && !isNaN(newVal) && newVal.trim() !== '') {
+                    product.price = Number(newVal);
+                    if (cart[id]) cart[id].price = Number(newVal);
+                    updateCartUI();
+                }
+            } else if (field === 'image') {
+                let newVal = prompt('Новая ссылка на картинку:', product.image);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.image = newVal;
+                    if (cart[id]) cart[id].image = newVal;
+                }
+            }
+
+            localStorage.setItem('yasyn_noodle_products', JSON.stringify(noodleProducts));
+            saveCartToStorage();
+            renderProducts();
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = noodleProducts.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+    </script>
+</body>
+</html>

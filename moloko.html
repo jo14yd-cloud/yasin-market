@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Молочные продукты - ЯСИН</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .admin-mode [data-editable] {
+            cursor: pointer;
+            border: 1px dashed #f97316;
+            padding: 2px 4px;
+            border-radius: 6px;
+            background-color: #fff7ed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-28" id="bodyRoot">
+
+    <!-- 1. ШАПКА САЙТА И ПОИСК -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-md mx-auto flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <!-- Кнопка назад слева -->
+                <a href="index.html" class="font-bold text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-xl transition hover:bg-orange-100">← Назад</a>
+                
+                <!-- Название МОЛОЧНЫЕ ПРОДУКТЫ строго в конце (справа) -->
+                <h1 id="adminTrigger" onclick="checkAdminAccess()" class="font-bold text-lg text-gray-900 leading-tight cursor-pointer select-none">Молочные продукты 🥛 </h1>
+
+                <div id="adminStatusBadge" class="hidden text-xs bg-emerald-500 text-white font-bold px-3 py-1 rounded-full">Админка ВКЛ</div>
+            </div>
+
+            <!-- Строка поиска -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="filterProducts()"
+                    placeholder="Быстрый поиск молочных продуктов..." 
+                    class="w-full bg-gray-100 text-gray-800 text-sm rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+                >
+            </div>
+
+        </div>
+    </header>
+
+    <!-- 3. СКРЫТАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="adminPanel" class="hidden max-w-md mx-auto my-4 p-4 bg-white rounded-2xl shadow-md border border-orange-200">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-base text-orange-600">➕ Добавить новый товар</h2>
+            <button onclick="checkAdminAccess()" class="text-xs text-red-500 font-bold">Закрыть</button>
+        </div>
+        <form id="addProductForm" onsubmit="addProduct(event)" class="flex flex-col gap-3">
+            <input type="text" id="prodName" placeholder="Название товара" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodPrice" placeholder="Цена в сомах" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodOldPrice" placeholder="Старая цена (необязательно)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodVolume" placeholder="Упаковка / объем (например, 1л)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodImage" placeholder="Ссылка на изображение (URL)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodDiscount" placeholder="Скидка (например, -10%)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition text-sm">Опубликовать товар</button>
+        </form>
+    </div>
+
+    <!-- 4. КАТАЛОГ ТОВАРОВ -->
+    <main class="max-w-md mx-auto p-4">
+        <h2 class="font-bold text-lg mb-3">Ассортимент молочных продуктов</h2>
+        <div id="productsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Динамические товары -->
+        </div>
+    </main>
+
+    <!-- 5. НИЖНЯЯ ПЛАВАЮЩАЯ КОРЗИНА -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t flex flex-col items-center gap-1 z-40">
+        <a href="korzina.html" onclick="saveCartToStorage()" class="w-full max-w-md bg-yellow-400 hover:bg-yellow-500 font-bold py-3 px-5 rounded-2xl shadow-lg flex items-center justify-between transition text-gray-900">
+            <span id="cartSummaryText" class="text-base font-extrabold">0 сом</span>
+            <span class="flex items-center gap-2 text-sm">
+                Перейти в корзину 🛒
+            </span>
+        </a>
+    </div>
+
+    <!-- 6. СКРИПТЫ УПРАВЛЕНИЯ -->
+    <script>
+        // Список товаров категории «Молочные продукты»
+        let defaultProducts = [
+            { id: 801, name: "БИО КЕФИР КЛУБНИКА БЕЛАЯ РЕКА 1л", price: 110, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=5381dc2ca35a642875e343b2170fcc13_l-3703763-images-thumbs&n=13", discount: null },
+            { id: 802, name: "БИО КЕФИР БАНАН БЕЛАЯ РЕКА 1л", price: 110, oldPrice: null, volume: "1л", image: "https://d1s5snyfutsm99.cloudfront.net/6c3/58d/476/20713351/conversions/product_image_MJ6vHR-list.jpg", discount: null },
+            { id: 803, name: "BIFI БЕЛАЯ РЕКА ДЫНЯ 0,5л", price: 90, oldPrice: null, volume: "0,5л", image: "https://halaltrading.ru/media/cache/f6/cc/f6cc8f80da849f329a89fcb144abc9f5.png", discount: null },
+            { id: 804, name: "BIFI БЕЛАЯ РЕКА КЛУБНИКА 0,5л", price: 90, oldPrice: null, volume: "0,5л", image: "https://halaltrading.ru/media/cache/f6/cc/f6cc8f80da849f329a89fcb144abc9f5.png", discount: null },
+            { id: 805, name: "ЙОГУРТ БЕЛАЯ РЕКА БАНАН 0,5л", price: 75, oldPrice: null, volume: "0,5л", image: "https://avatars.mds.yandex.net/i?id=93c92d8667c4c066f36c338bd475e58f_l-4012334-images-thumbs&n=13", discount: null },
+            { id: 806, name: "ЙОГУРТ БЕЛАЯ РEКА КЛУБНИКА 0,5л", price: 75, oldPrice: null, volume: "0,5л", image: "https://resources.cdn-kaspi.kz/img/m/p/p35/pa6/95660628.jpg?format=gallery-large", discount: null },
+            { id: 807, name: "КЕФИР 2,5% ЖЕТИ БААТЫР 1л", price: 75, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=acd65277b2d85683932b3d6b52c0564e_sr-5325822-images-thumbs&n=13", discount: null },
+            { id: 808, name: "КЕФИР 1% ЖЕТИ БААТЫР 1л", price: 75, oldPrice: null, volume: "1л", image: "https://avatars.mds.yandex.net/i?id=acd65277b2d85683932b3d6b52c0564e_sr-5325822-images-thumbs&n=13", discount: null },
+            { id: 809, name: "КЕФИР 2,5% ВЕСЕЛЫЙ МОЛОЧНИК 1л", price: 110, oldPrice: null, volume: "1л", image: "https://i.otzovik.com/objects/b/60000/50978.webp", discount: null },
+            { id: 810, name: "КЕФИР 2,5% ТАЗА СУТ 1л", price: 95, oldPrice: null, volume: "1л", image: "https://foodrynok.ru/image/catalog/1-rynki/maconi.png", discount: null },
+            { id: 811, name: "СМЕТАНА 15% ЖЕТИ БААТЫР 1л", price: 130, oldPrice: null, volume: "1л", image: "https://static.insales-cdn.com/images/products/1/6473/472488265/%D1%81%D0%BC%D0%B5%D1%82%D0%B0%D0%BD%D0%B0.jpg", discount: null },
+            { id: 812, name: "СМЕТАНА 15% ЖЕТИ БААТЫР 700г", price: 95, oldPrice: null, volume: "700г", image: "https://avatars.mds.yandex.net/i?id=034e9115aad93ea3e892aa74e9150deb_l-5843049-images-thumbs&n=13", discount: null },
+            { id: 813, name: "СМЕТАНА 15% ЖЕТИ БААТЫР 400г", price: 65, oldPrice: null, volume: "400г", image: "https://images.deliveryhero.io/image/menus-glovo/products/5319b89fdabee20e12ebe403a57439528998e5707527ef5b433b0268245aaaaa", discount: null },
+            { id: 814, name: "КАЙМАК 30% ЖЕТИ БААТЫР 300г", price: 80, oldPrice: null, volume: "300г", image: "https://images.deliveryhero.io/image/menus-glovo/products/25c4c9883a7806a3b17990ab22bf7c5edc30292376cc636f7521aa04c844f866", discount: null },
+            { id: 815, name: "КАЙМАК 30% ЖЕТИ БААТЫР 200г", price: 60, oldPrice: null, volume: "200г", image: "https://images.deliveryhero.io/image/menus-glovo/products/25c4c9883a7806a3b17990ab22bf7c5edc30292376cc636f7521aa04c844f866", discount: null },
+            { id: 816, name: "СМЕТАНА 20% ЖЕТИ БААТЫР 200г", price: 40, oldPrice: null, volume: "200г", image: "https://imgproxy.kuper.ru/imgproxy/size-680-680/czM6Ly9zYi1vYnMtcHJvZC1jb250ZW50LWltYWdlczAxL3Byb2R1Y3RzLzMzNDM4NjI5L29yaWdpbmFsLzEvMjAyNi0wNS0wNCUyMDE3JTNBMGSyMCExOC40MTIyODUlMkIwMCUzQTAwLzMzNDM4NjI5XzEuanBn", discount: null },
+            { id: 817, name: "СМЕТАНА 20% БЕЛАЯ РЕКА 300г", price: 110, oldPrice: null, volume: "300г", image: "https://img.nedostavka.net/67473ad8143012791204bb6b", discount: null },
+            { id: 818, name: "СМЕТАНА 15% БЕЛАЯ РЕКА 300г", price: 100, oldPrice: null, volume: "300г", image: "https://avatars.mds.yandex.net/i?id=44d16af7fcd9979146a1c7cd75fce348_l-13092708-images-thumbs&n=13", discount: null },
+            { id: 819, name: "ЧУДO ЙОГУРТ 250г", price: 100, oldPrice: null, volume: "250г", image: "https://ir.ozone.ru/s3/multimedia-1-0/7965342612.jpg", discount: null },
+            { id: 820, name: "ЧУДO ЙОГУРТ 115г", price: 50, oldPrice: null, volume: "115г", image: "https://imageproxy.wolt.com/assets/699ff65d96d75d61e2466917", discount: null },
+            { id: 821, name: "ФРУГУРТ ЙОГУРТ 115г", price: 45, oldPrice: null, volume: "115г", image: "https://youmarket.shop/images/detailed/75/czM6Ly9jb250ZW50LWltYWdlcy1wcm9kL3Byb2R1Y3RzLzIwNTI0MjE4L29yaWdpbmFsLzEvMjAyNC0wNC0xNVQwOSUzQTU3JTNBNDIuODg4MTcyJTJCMDAlM0EwMC8yMDUyNDIxOF8xLmpwZWc=.png", discount: null },
+            { id: 822, name: "НЕЖНЫЙ ЙОГУРТ 95г", price: 35, oldPrice: null, volume: "95г", image: "https://avatars.mds.yandex.net/get-eda/15143849/3c3db7d4c4bc026db9f9c2329de29426/orig", discount: null },
+            { id: 823, name: "НЕЖНЫЙ ЙОГУРТ 95г (2)", price: 30, oldPrice: null, volume: "95г", image: "https://avatars.mds.yandex.net/get-eda/14904645/689c8c45ec84720d49caba88efb292e2/orig", discount: null },
+            { id: 824, name: "ALPENLAND ЙОГУРТ 95г", price: 25, oldPrice: null, volume: "95г", image: "https://main-cdn.sbermegamarket.ru/big1/hlr-system/122/303/915/311/111/455/100044944959b0.jpeg", discount: null },
+            { id: 825, name: "ТВОРОГ БЕЛАЯ РЕКА БАНАН 360г", price: 160, oldPrice: null, volume: "360г", image: "https://yastatic.net/avatars/get-grocery-goods-b2b/10241750/60732dca-4ba7-4c98-8acc-d0d8bd05f851/600x600?webp=true", discount: null },
+            { id: 826, name: "ТВОРОГ БЕЛАЯ РЕКА КЛУБНИКА 360г", price: 160, oldPrice: null, volume: "360г", image: "https://avatars.mds.yandex.net/i?id=33a6defd73a9bf0d720e118519b852b1_l-4485427-images-thumbs&n=13", discount: null },
+            { id: 827, name: "ТВОРОГ БЕЛАЯ РЕКА БАНАН 180г", price: 80, oldPrice: null, volume: "180г", image: "https://d1s5snyfutsm99.cloudfront.net/ae6/016/698/22342872/conversions/product_image_C0P9lU-list.jpg", discount: null },
+            { id: 828, name: "ТВОРОГ БЕЛАЯ РЕКА КЛУБНИКА 180г", price: 80, oldPrice: null, volume: "180г", image: "https://avatars.mds.yandex.net/i?id=f24a783f9e197fa2f39527c3d402633e_l-16514385-images-thumbs&n=13", discount: null },
+            { id: 829, name: "ТВОРОГ ЖЕТИ БААТИР", price: 75, oldPrice: null, volume: "вес", image: "https://alpha.tablicakalorijnosti.ru/file/image/foodstuff/79822a8dd06249e4a79c6cc9551aefbf/321d24fc5f81418bb46841a3cd171f6f?w=300", discount: null },
+            { id: 830, name: "ТВОРОГ ЖЕТИ БААТИР ИЗЮМ", price: 135, oldPrice: null, volume: "упак", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0iAbdon-iEkFRD2brhZGY5vtIj2ekqFr11w&s", discount: null },
+            { id: 831, name: "ТВОРОГ ЖЕТИ БААТИР АБРИКОС", price: 135, oldPrice: null, volume: "упак", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ90DkWsUoqoh64mzmyHeT8WBn1slzFNBJ8cw&s", discount: null }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('shop_products_molochnye')) || defaultProducts;
+        let clickCount = 0;
+        let isAdminActive = false;
+        let cart = JSON.parse(localStorage.getItem('asia_cart')) || {};
+
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        };
+
+        function saveCartToStorage() {
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
+        }
+
+        // Вход в админку по 5 кликам
+        function checkAdminAccess() {
+            clickCount++;
+            if (clickCount >= 5) {
+                clickCount = 0;
+                const password = prompt("Введите пароль администратора ");
+                if (password === "484831") {
+                    isAdminActive = !isAdminActive;
+                    const panel = document.getElementById('adminPanel');
+                    const badge = document.getElementById('adminStatusBadge');
+                    const body = document.getElementById('bodyRoot');
+
+                    if (isAdminActive) {
+                        panel.classList.remove('hidden');
+                        badge.classList.remove('hidden');
+                        body.classList.add('admin-mode');
+                        alert("🔓 Админка включена! Теперь можно удалять товары крестиком и изменять их данные.");
+                    } else {
+                        panel.classList.add('hidden');
+                        badge.classList.add('hidden');
+                        body.classList.remove('admin-mode');
+                    }
+                    renderProducts();
+                } else if (password !== null) {
+                    alert("❌ Неверный пароль!");
+                }
+            }
+        }
+
+        function renderProducts(itemsToRender = products) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            itemsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between relative product-card";
+                card.setAttribute('data-name', product.name.toLowerCase());
+                
+                let currentQty = cart[product.id] ? cart[product.id].qty : 0;
+
+                card.innerHTML = `
+                    ${product.discount ? `<span class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full z-10">${product.discount}</span>` : ''}
+                    
+                    <!-- Кнопка удаления для админа -->
+                    <button onclick="deleteProduct(${product.id})" class="admin-only ${isAdminActive ? '' : 'hidden'} absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center z-20 shadow font-bold">✕</button>
+
+                    <div class="relative w-full h-32 mb-2 flex items-center justify-center">
+                        <img src="${product.image}" alt="${product.name}" class="max-h-full object-contain rounded-xl" ${isAdminActive ? `onclick="editProduct(${product.id}, 'image')" title="Кликните для смены картинки"` : ''}>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-base text-gray-900" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'price')"` : ''}>${product.price} сом</span>
+                            ${product.oldPrice ? `<span class="text-xs text-gray-400 line-through">${product.oldPrice} сом</span>` : ''}
+                        </div>
+                        <h3 class="text-xs text-gray-700 line-clamp-2 mt-1" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'name')"` : ''}>${product.name}</h3>
+                        <p class="text-[10px] text-gray-400 mt-0.5">${product.volume}</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-end mt-3">
+                        <div id="control-${product.id}">
+                            ${currentQty === 0 ? `
+                                <button onclick="changeQuantity(${product.id}, 1)" class="bg-gray-100 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition text-gray-800 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            ` : `
+                                <div class="flex items-center gap-1 bg-orange-500 text-white rounded-xl px-2 py-1 shadow-sm">
+                                    <button onclick="changeQuantity(${product.id}, -1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">-</button>
+                                    <span class="text-xs font-bold px-1">${currentQty}</span>
+                                    <button onclick="changeQuantity(${product.id}, 1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">+</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Управление количеством в корзине
+        function changeQuantity(id, delta) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (!cart[id]) {
+                cart[id] = { name: product.name, price: product.price, volume: product.volume, qty: 0 };
+            }
+
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) {
+                delete cart[id];
+            }
+
+            renderProducts();
+            updateCartUI();
+            saveCartToStorage();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                totalCount += cart[id].qty;
+                totalPrice += cart[id].qty * cart[id].price;
+            }
+
+            let summaryElement = document.getElementById('cartSummaryText');
+            if (totalCount > 0) {
+                summaryElement.innerText = `${totalCount} тов. • ${totalPrice} сом`;
+            } else {
+                summaryElement.innerText = '0 сом';
+            }
+        }
+
+        // Добавление товара через админку
+        function addProduct(event) {
+            event.preventDefault();
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('prodName').value,
+                price: Number(document.getElementById('prodPrice').value),
+                oldPrice: document.getElementById('prodOldPrice').value ? Number(document.getElementById('prodOldPrice').value) : null,
+                volume: document.getElementById('prodVolume').value,
+                image: document.getElementById('prodImage').value,
+                discount: document.getElementById('prodDiscount').value || null
+            };
+
+            products.unshift(newProduct);
+            localStorage.setItem('shop_products_molochnye', JSON.stringify(products));
+            
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            alert('✅ Товар успешно добавлен в каталог!');
+        }
+
+        // Удаление товара в админке
+        function deleteProduct(id) {
+            if (confirm('Удалить этот товар из каталога?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('shop_products_molochnye', JSON.stringify(products));
+                if (cart[id]) {
+                    delete cart[id];
+                    updateCartUI();
+                    saveCartToStorage();
+                }
+                renderProducts();
+            }
+        }
+
+        // Редактирование товара по клику в админке
+        function editProduct(id, field) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (field === 'name') {
+                let newVal = prompt('Новое название товара:', product.name);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.name = newVal;
+                    if (cart[id]) cart[id].name = newVal;
+                }
+            } else if (field === 'price') {
+                let newVal = prompt('Новая цена в сомах:', product.price);
+                if (newVal !== null && !isNaN(newVal) && newVal.trim() !== '') {
+                    product.price = Number(newVal);
+                    if (cart[id]) cart[id].price = Number(newVal);
+                    updateCartUI();
+                }
+            } else if (field === 'image') {
+                let newVal = prompt('Новая ссылка на картинку:', product.image);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.image = newVal;
+                }
+            }
+
+            localStorage.setItem('shop_products_molochnye', JSON.stringify(products));
+            saveCartToStorage();
+            renderProducts();
+        }
+
+        // Фильтрация (быстрый поиск)
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+    </script>
+</body>
+</html>

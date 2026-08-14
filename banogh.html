@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Энергетики и напитки - ЯСИН</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .admin-mode [data-editable] {
+            cursor: pointer;
+            border: 1px dashed #f97316;
+            padding: 2px 4px;
+            border-radius: 6px;
+            background-color: #fff7ed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-28" id="bodyRoot">
+
+    <!-- 1. ШАПКА СТРАНИЦЫ -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-md mx-auto flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <a href="index.html" class="flex items-center gap-1 text-sm font-bold text-orange-500 hover:text-orange-600 transition">
+                    ← Назад
+                </a>
+                <!-- Клик 5 раз по заголовку открывает админку -->
+                <h1 id="adminTrigger" onclick="checkAdminAccess()" class="font-bold text-lg text-gray-900 leading-tight cursor-pointer select-none text-center">Энергетики и напитки ⚡</h1>
+                <div id="adminStatusBadge" class="hidden text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">Админка ВКЛ</div>
+            </div>
+
+            <!-- Строка поиска по разделу -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="filterProducts()"
+                    placeholder="Поиск напитков..." 
+                    class="w-full bg-gray-100 text-gray-800 text-sm rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+                >
+            </div>
+
+        </div>
+    </header>
+
+    <!-- 2. СКРЫТАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="adminPanel" class="hidden max-w-md mx-auto my-4 p-4 bg-white rounded-2xl shadow-md border border-orange-200 mx-4">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-base text-orange-600">➕ Добавить новый напиток</h2>
+            <button onclick="checkAdminAccess()" class="text-xs text-red-500 font-bold">Закрыть</button>
+        </div>
+        <form id="addProductForm" onsubmit="addProduct(event)" class="flex flex-col gap-3">
+            <input type="text" id="prodName" placeholder="Название (например, NITRO GREEN 0,45л)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodPrice" placeholder="Цена в сомах" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodOldPrice" placeholder="Старая цена (необязательно)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodVolume" placeholder="Объем (например, 0,45л)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodImage" placeholder="Ссылка на изображение (URL)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodDiscount" placeholder="Скидка (например, -10%)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition text-sm">Опубликовать товар</button>
+        </form>
+    </div>
+
+    <!-- 3. КАТАЛОГ ТОВАРОВ -->
+    <main class="max-w-md mx-auto p-4">
+        <h2 class="font-bold text-lg mb-3">Ассортимент</h2>
+        <div id="productsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Динамические товары -->
+        </div>
+    </main>
+
+    <!-- 4. НИЖНЯЯ ПЛАВАЮЩАЯ КОРЗИНА -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t flex flex-col items-center gap-1 z-40">
+        <a href="korzina.html" onclick="saveCartToStorage()" class="w-full max-w-md bg-yellow-400 hover:bg-yellow-500 font-bold py-3 px-5 rounded-2xl shadow-lg flex items-center justify-between transition text-gray-900">
+            <span id="cartSummaryText" class="text-base font-extrabold">0 сом</span>
+            <span class="flex items-center gap-2 text-sm">
+                Перейти в корзину 🛒
+            </span>
+        </a>
+    </div>
+
+    <!-- 5. СКРИПТЫ УПРАВЛЕНИЯ -->
+    <script>
+        let clickCount = 0;
+        let isAdminActive = false;
+        let cart = JSON.parse(localStorage.getItem('asia_cart')) || {};
+
+        // Базовые товары для раздела энергетиков и напитков
+        let drinksProducts = JSON.parse(localStorage.getItem('yasyn_drinks_products')) || [
+            { id: 1, name: "NITRO GREEN ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/5216590/img_id362706678678697277.jpeg/orig", discount: null },
+            { id: 2, name: "NITRO EXTREME ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-v/6271696279.jpg", discount: null },
+            { id: 3, name: "NITRO EXOTIC ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/4345877/img_id1185717723929110891.jpeg/orig", discount: null },
+            { id: 4, name: "NITRO JUICED ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=fa0f5410633da4ede3a1ad7cffad67aec32109f6-6263806-images-thumbs&n=13", discount: null },
+            { id: 5, name: "DRIVE ORGINAL 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://s.myspar.ru/upload/img/10/1003/100335271.jpg?1746607022", discount: null },
+            { id: 6, name: "DRIVE BERRY KICK 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-eda/18916937/a4d239d87b317e4df31947d3e7df50f4/orig", discount: null },
+            { id: 7, name: "GORILLA ORGINAL 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=2ce02278bf8e738efce986c38e6019a0_l-4570724-images-thumbs&n=13", discount: null },
+            { id: 8, name: "GORILLA MANGO 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/17759967/2a0000019de83631fa1afbf2fd33e9436008/orig", discount: null },
+            { id: 9, name: "GORILLA ORANGE 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://www.deloks.ru/upload/iblock/124/500f718ir65r2oxhi5in58h3utn81m0o/napitok_energeticheskiy_gorilla_orange_bezalk_toniz_zh_b_0_45lkh24sht_up_4_full.jpg", discount: null },
+            { id: 10, name: "GORILLA MELON 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://cdn.shopify.com/s/files/1/0984/9860/9446/files/Gorila_W_M_can_mockup_500ml.png?v=1763186784&width=800", discount: null },
+            { id: 11, name: "FLASH ORGINAL 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=c71d6363702510fc1cd52d11f29baa1f_l-9264723-images-thumbs&n=13", discount: null },
+            { id: 12, name: "FLASH NIGHT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://carlsberg-group-2022.euwest01.umbraco.io/media/10pgrixh/flashup_night_movie_black_21-1.png", discount: null },
+            { id: 13, name: "TORNADO MANGO 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-1-l/12317460933.jpg", discount: null },
+            { id: 14, name: "TORNADO STORM 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=ad459d6749a04a90f520b48d759673cf_l-5616093-images-thumbs&n=13", discount: null },
+            { id: 15, name: "TORNADO ICEBERRY 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-1-5/c1000/8466680813.jpg", discount: null },
+            { id: 16, name: "TORNADO SKILL 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=035027ba7701357b01c4df0d10c1fd94_l-5597167-images-thumbs&n=13", discount: null },
+            { id: 17, name: "LAVINA ORGINAL 0,45л", price: 55, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=c2c88fdc466bae542d40ab48ba0cf25edb9cd87a-5317815-images-thumbs&n=13", discount: null },
+            { id: 18, name: "LAVINA MANGO 0,45л", price: 55, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=26458eacafefba9374a827825fb0a2d719716ca3-8529854-images-thumbs&n=13", discount: null },
+            { id: 19, name: "LAVINA POWER 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://imageproxy.wolt.com/assets/6a3e483247424ff12e2c8dae", discount: null },
+            { id: 20, name: "KHABIB ENERGY 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-altay/10267222/2a00000193300c7581cc2e036063613d576c/XXXL", discount: null },
+            { id: 21, name: "ADRINALIN 0,45л", price: 130, oldPrice: null, volume: "0,45л", image: "https://marketdo4a.com/upload/iblock/414/energeticheskii_napitok_adrenaline_rush_3.jpg", discount: null },
+            { id: 22, name: "FLAVIS CURRANT 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://pimg2.supl.biz/media/proposals/images/81/f8/supl_81f81f1d-e7bd-4949-b148-c7655c454155.png", discount: null },
+            { id: 23, name: "FLAVIS RASPBERRY 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://pimg1.supl.biz/media/proposals/images/e3/ac/supl_e3ac96a7-344f-4054-8c8a-4206250e793b.png", discount: null },
+            { id: 24, name: "FLAVIS POMEGRANATE 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://cdn2.may24.ru/upload/iblock/f70/5iulvwgel6l5t73aqdf6279dp15ntp67.jpg", discount: null },
+            { id: 25, name: "FLAVIS PEAR 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://ecimg.cafe24img.com/pg177b13848986083/foodfortune/web/product/big/20260103/bae5d6e8385626d443a639fd457b0341.jpg", discount: null },
+            { id: 26, name: "MOJITO CITY BAR GRANAT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=1b0cb18cded1dd8cbf58ce82287354c5_l-4230742-images-thumbs&n=13", discount: null },
+            { id: 27, name: "MOJITO CITY BAR LIME 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=b099415b4264648d45d998972e917654_l-12652282-images-thumbs&n=13", discount: null },
+            { id: 28, name: "MOJITO CITY BAR MANGO 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=5308c422e9a389cb12622a46f10688a9_l-3888471-images-thumbs&n=13", discount: null },
+            { id: 29, name: "MOJITO CITY BAR STRAWBERRY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://images.satu.kz/232804251_w200_h200_napitok-mojito-fresh.jpg", discount: null },
+            { id: 30, name: "ZIGI ZAGI MOXITO 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://simg.marwin.kz/media/catalog/product/n/a/napitok_zigizagi_so_vkusom_mok_1.png", discount: null },
+            { id: 31, name: "ZIGI ZAGI GRANAT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://produktoff.kz/pictures/product/big/36688_big.png", discount: null },
+            { id: 32, name: "ZIGI ZAGI LEMONADE 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://imageproxy.wolt.com/assets/6a2a7c7d834e58a736c2a5df", discount: null },
+            { id: 33, name: "ZIGI ZAGI KIWI 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=8fe70c45f07ace4d0206725d4c0c1182_l-5349316-images-thumbs&n=13", discount: null },
+            { id: 34, name: "COCA COLA 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://tabac.ru/files/products/3_8.350x350.png", discount: null },
+            { id: 35, name: "SALAM COLA 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://static.ayanmarket.kz/products/images/image_2025-12-22-10-31-77_4870001573836.png", discount: null }
+        ];
+
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        };
+
+        function saveCartToStorage() {
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
+        }
+
+        // Вход в админку по 5 кликам по заголовку
+        function checkAdminAccess() {
+            clickCount++;
+            if (clickCount >= 5) {
+                clickCount = 0;
+                const password = prompt("Введите пароль администратора ");
+                if (password === "484831") {
+                    isAdminActive = !isAdminActive;
+                    const panel = document.getElementById('adminPanel');
+                    const badge = document.getElementById('adminStatusBadge');
+                    const body = document.getElementById('bodyRoot');
+
+                    if (isAdminActive) {
+                        panel.classList.remove('hidden');
+                        badge.classList.remove('hidden');
+                        body.classList.add('admin-mode');
+                        alert("🔓 Админка включена! Теперь можно удалять товары и изменять их по клику.");
+                    } else {
+                        panel.classList.add('hidden');
+                        badge.classList.add('hidden');
+                        body.classList.remove('admin-mode');
+                    }
+                    renderProducts();
+                } else if (password !== null) {
+                    alert("❌ Неверный пароль!");
+                }
+            }
+        }
+
+        function renderProducts(itemsToRender = drinksProducts) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            itemsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between relative product-card";
+                
+                let currentQty = cart[product.id] ? cart[product.id].qty : 0;
+
+                card.innerHTML = `
+                    ${product.discount ? `<span class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full z-10">${product.discount}</span>` : ''}
+                    
+                    <!-- Кнопка удаления для админа -->
+                    <button onclick="deleteProduct(${product.id})" class="admin-only ${isAdminActive ? '' : 'hidden'} absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center z-20 shadow font-bold">✕</button>
+
+                    <div class="relative w-full h-32 mb-2 flex items-center justify-center">
+                        <img src="${product.image}" alt="${product.name}" class="max-h-full object-contain rounded-xl" ${isAdminActive ? `onclick="editProduct(${product.id}, 'image')" title="Кликните для смены картинки"` : ''}>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-base text-gray-900" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'price')"` : ''}>${product.price} сом</span>
+                            ${product.oldPrice ? `<span class="text-xs text-gray-400 line-through">${product.oldPrice} сом</span>` : ''}
+                        </div>
+                        <h3 class="text-xs text-gray-700 line-clamp-2 mt-1" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'name')"` : ''}>${product.name}</h3>
+                        <p class="text-[10px] text-gray-400 mt-0.5">⚡ ${product.volume}</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-end mt-3">
+                        <div id="control-${product.id}">
+                            ${currentQty === 0 ? `
+                                <button onclick="changeQuantity(${product.id}, 1)" class="bg-gray-100 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition text-gray-800 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            ` : `
+                                <div class="flex items-center gap-1 bg-orange-500 text-white rounded-xl px-2 py-1 shadow-sm">
+                                    <button onclick="changeQuantity(${product.id}, -1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">-</button>
+                                    <span class="text-xs font-bold px-1">${currentQty}</span>
+                                    <button onclick="changeQuantity(${product.id}, 1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">+</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function changeQuantity(id, delta) {
+            let product = drinksProducts.find(p => p.id === id);
+            if (!product) return;
+
+            if (!cart[id]) {
+                cart[id] = { name: product.name, price: product.price, volume: product.volume, image: product.image, qty: 0 };
+            }
+
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) {
+                delete cart[id];
+            }
+
+            renderProducts();
+            updateCartUI();
+            saveCartToStorage();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                totalCount += cart[id].qty;
+                totalPrice += cart[id].qty * cart[id].price;
+            }
+
+            let summaryElement = document.getElementById('cartSummaryText');
+            if (totalCount > 0) {
+                summaryElement.innerText = `${totalCount} тов. • ${totalPrice} сом`;
+            } else {
+                summaryElement.innerText = '0 сом';
+            }
+        }
+
+        function addProduct(event) {
+            event.preventDefault();
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('prodName').value,
+                price: Number(document.getElementById('prodPrice').value),
+                oldPrice: document.getElementById('prodOldPrice').value ? Number(document.getElementById('prodOldPrice').value) : null,
+                volume: document.getElementById('prodVolume').value,
+                image: document.getElementById('prodImage').value,
+                discount: document.getElementById('prodDiscount').value || null
+            };
+
+            drinksProducts.unshift(newProduct);
+            localStorage.setItem('yasyn_drinks_products', JSON.stringify(drinksProducts));
+            
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            alert('✅ Напиток успешно добавлен в каталог!');
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Удалить этот напиток из каталога?')) {
+                drinksProducts = drinksProducts.filter(p => p.id !== id);
+                localStorage.setItem('yasyn_drinks_products', JSON.stringify(drinksProducts));
+                if (cart[id]) {
+                    delete cart[id];
+                    updateCartUI();
+                    saveCartToStorage();
+                }
+                renderProducts();
+            }
+        }
+
+        function editProduct(id, field) {
+            let product = drinksProducts.find(p => p.id === id);
+            if (!product) return;
+
+            if (field === 'name') {
+                let newVal = prompt('Новое название напитка:', product.name);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.name = newVal;
+                    if (cart[id]) cart[id].name = newVal;
+                }
+            } else if (field === 'price') {
+                let newVal = prompt('Новая цена в сомах:', product.price);
+                if (newVal !== null && !isNaN(newVal) && newVal.trim() !== '') {
+                    product.price = Number(newVal);
+                    if (cart[id]) cart[id].price = Number(newVal);
+                    updateCartUI();
+                }
+            } else if (field === 'image') {
+                let newVal = prompt('Новая ссылка на картинку:', product.image);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.image = newVal;
+                    if (cart[id]) cart[id].image = newVal;
+                }
+            }
+
+            localStorage.setItem('yasyn_drinks_products', JSON.stringify(drinksProducts));
+            saveCartToStorage();
+            renderProducts();
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = drinksProducts.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+    </script>
+</body>
+</html>

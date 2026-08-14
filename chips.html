@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чипсы и Кукуруза - ЯСИН</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .admin-mode [data-editable] {
+            cursor: pointer;
+            border: 1px dashed #f97316;
+            padding: 2px 4px;
+            border-radius: 6px;
+            background-color: #fff7ed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-28" id="bodyRoot">
+
+    <!-- 1. ШАПКА САЙТА И ПОИСК -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-md mx-auto flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <!-- Кнопка назад слева -->
+                <a href="index.html" class="font-bold text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-xl transition hover:bg-orange-100">← Назад</a>
+                
+                <!-- Название категории справа -->
+                <h1 id="adminTrigger" onclick="checkAdminAccess()" class="font-bold text-lg text-gray-900 leading-tight cursor-pointer select-none">Чипсы и Кукуруза</h1>
+
+                <div id="adminStatusBadge" class="hidden text-xs bg-emerald-500 text-white font-bold px-3 py-1 rounded-full">Админка ВКЛ</div>
+            </div>
+
+            <!-- Строка поиска -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="filterProducts()"
+                    placeholder="Поиск чипсов, сухариков, кириешек..." 
+                    class="w-full bg-gray-100 text-gray-800 text-sm rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+                >
+            </div>
+
+        </div>
+    </header>
+
+    <!-- 3. СКРЫТАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="adminPanel" class="hidden max-w-md mx-auto my-4 p-4 bg-white rounded-2xl shadow-md border border-orange-200">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-base text-orange-600">➕ Добавить новый товар</h2>
+            <button onclick="checkAdminAccess()" class="text-xs text-red-500 font-bold">Закрыть</button>
+        </div>
+        <form id="addProductForm" onsubmit="addProduct(event)" class="flex flex-col gap-3">
+            <input type="text" id="prodName" placeholder="Название товара" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodPrice" placeholder="Цена в сомах" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodOldPrice" placeholder="Старая цена (необязательно)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodVolume" placeholder="Фасовка / вес (например, 140г, 1кг)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodImage" placeholder="Ссылка на изображение (URL)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodDiscount" placeholder="Скидка (например, -10%)" class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition text-sm">Опубликовать товар</button>
+        </form>
+    </div>
+
+    <!-- 4. КАТАЛОГ ТОВАРОВ -->
+    <main class="max-w-md mx-auto p-4">
+        <h2 class="font-bold text-lg mb-3">Ассортимент</h2>
+        <div id="productsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Динамические товары -->
+        </div>
+    </main>
+
+    <!-- 5. НИЖНЯЯ ПЛАВАЮЩАЯ КОРЗИНА -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t flex flex-col items-center gap-1 z-40">
+        <a href="korzina.html" onclick="saveCartToStorage()" class="w-full max-w-md bg-yellow-400 hover:bg-yellow-500 font-bold py-3 px-5 rounded-2xl shadow-lg flex items-center justify-between transition text-gray-900">
+            <span id="cartSummaryText" class="text-base font-extrabold">0 сом</span>
+            <span class="flex items-center gap-2 text-sm">
+                Перейти в корзину 🛒
+            </span>
+        </a>
+    </div>
+
+    <!-- 6. СКРИПТЫ УПРАВЛЕНИЯ -->
+    <script>
+        // Полный список чипсов, сухариков, кириешек и кукурузы
+        let defaultProducts = [
+            { id: 3101, name: "ЧИПСЫ LAY'S СО ВКУСОМ ШАШЛЫКА", price: 160, oldPrice: null, volume: "140г", image: "https://basket-40.wbbasket.ru/vol9411/part941116/941116899/images/big/1.webp", discount: null },
+            { id: 3102, name: "ЧИПСЫ LAY'S СО ВКУСОМ СЫРА", price: 160, oldPrice: null, volume: "140г", image: "https://avatars.mds.yandex.net/get-mpic/20370129/2a0000019f49fa1f6c03812005cd24d1ccbe/orig", discount: null },
+            { id: 3103, name: "ЧИПСЫ LAY'S СО ВКУСОМ ЗЕЛЕНЫЙ ЛУК", price: 160, oldPrice: null, volume: "140г", image: "https://avatars.mds.yandex.net/i?id=7d2fe24d6c552ce12967840ed9550a7335d10331-2386581-images-thumbs&n=13", discount: null },
+            { id: 3104, name: "ЧИПСЫ LAY'S СО ВКУСОМ КРАБА", price: 160, oldPrice: null, volume: "140г", image: "https://avatars.mds.yandex.net/get-mpic/17632597/2a0000019f49fa1f6d2ab633f05e551809ef/orig", discount: null },
+            { id: 3105, name: "ЧИПСЫ LAY'S СО ВКУСОМ СМЕТАНА И ЗЕЛЕНЬ", price: 160, oldPrice: null, volume: "140г", image: "https://www.auchan.ru/f/c/insecure/w:620/plain/https://www.auchan.ru/files/original/37166685/", discount: null },
+            { id: 3106, name: "ЧИПСЫ LAY'S РИФЛЕНЫЕ", price: 160, oldPrice: null, volume: "140г", image: "https://avatars.mds.yandex.net/get-mpic/15229008/img_id1068986625374785506.jpeg/orig", discount: null },
+            { id: 3107, name: "ЧИПСЫ LAY'S ПАПРИКА", price: 160, oldPrice: null, volume: "140г", image: "https://resources.cdn-kaspi.kz/img/m/p/pe4/p86/155533890.?format=gallery-large", discount: null },
+            { id: 3108, name: "ЧИПСЫ LAY'S MAXX", price: 160, oldPrice: null, volume: "140г", image: "https://basket-29.wbbasket.ru/vol5559/part555924/555924466/images/big/1.webp", discount: null },
+            
+            { id: 3109, name: "ЧИПСЫ LAY'S СО ВКУСОМ ШАШЛЫКА", price: 100, oldPrice: null, volume: "70г", image: "https://avatars.mds.yandex.net/i?id=14a541dcc0f273183de9ae443391e47a_l-11921588-images-thumbs&n=13", discount: null },
+            { id: 3110, name: "ЧИПСЫ LAY'S СО ВКУСОМ СЫРА", price: 100, oldPrice: null, volume: "70г", image: "https://avatars.mds.yandex.net/get-eda/3502490/4e47dfdd9321c6c7aee8d1259fd1f104/1200x1200nocrop", discount: null },
+            { id: 3111, name: "ЧИПСЫ LAY'S СО ВКУСОМ ЗЕЛЕНЫЙ ЛУК", price: 100, oldPrice: null, volume: "70г", image: "https://avatars.mds.yandex.net/i?id=278a8abd38ce886b48ca03272e0a057b_l-5500501-images-thumbs&n=13", discount: null },
+            { id: 3112, name: "ЧИПСЫ LAY'S СО ВКУСОМ КРАБА", price: 100, oldPrice: null, volume: "70г", image: "https://avatars.mds.yandex.net/get-mpic/2009321/2a0000019b03330749ef82d641305f1828f3/orig", discount: null },
+            { id: 3113, name: "ЧИПСЫ LAY'S СО ВКУСОМ СМЕТАНА И ЗЕЛЕНЬ", price: 100, oldPrice: null, volume: "70г", image: "", discount: null },
+            { id: 3114, name: "ЧИПСЫ LAY'S РИФЛЕНЫЕ", price: 100, oldPrice: null, volume: "70г", image: "https://avatars.mds.yandex.net/get-mpic/16111726/2a0000019afd4b51b8707103b90e34583d2b/orig", discount: null },
+            { id: 3115, name: "ЧИПСЫ LAY'S ПАПРИКА", price: 100, oldPrice: null, volume: "70г", image: "https://cdn.ime.by/UserFiles/images/catalog/Goods/2441/01772441/norm/01772441.n_1.png", discount: null },
+            
+            { id: 3116, name: "ЧИПСЫ LAY'S СО ВКУСОМ СЫРА", price: 75, oldPrice: null, volume: "50г", image: "https://ir.ozone.ru/s3/multimedia-x/6043363185.jpg", discount: null },
+            { id: 3117, name: "ЧИПСЫ LAY'S СО ВКУСОМ СМЕТАНА И ЗЕЛЕНЬ", price: 75, oldPrice: null, volume: "50г", image: "https://avatars.mds.yandex.net/i?id=89c573fc3bf95d2dce8b50de039a1bb50bce0c2e-10748854-images-thumbs&n=13", discount: null },
+            
+            { id: 3118, name: "ЧИПСЫ LAY'S СО ВКУСОМ СМЕТАНА И ЗЕЛЕНЬ", price: 35, oldPrice: null, volume: "20г", image: "https://avatars.mds.yandex.net/get-mpic/13230222/2a000001922e70d293d054c4db73ee4a4ca3/orig", discount: null },
+            { id: 3119, name: "ЧИПСЫ LAY'S СО ВКУСОМ ЗЕЛЕНЫЙ ЛУК", price: 35, oldPrice: null, volume: "20г", image: "https://avatars.mds.yandex.net/get-eda/3816972/605cc8d5e65036dec8204487d64352cb/orig", discount: null },
+            
+            { id: 3120, name: "ЧИПСЫ SANCHO ВЕС", price: 200, oldPrice: null, volume: "365г", image: "https://bozorcom.ams3.cdn.digitaloceanspaces.com/media/products/chips.webp", discount: null },
+            { id: 3121, name: "ЧИПСЫ SANCHO ВЕС", price: 100, oldPrice: null, volume: "185г", image: "https://bozorcom.ams3.cdn.digitaloceanspaces.com/media/products/chips.webp", discount: null },
+            { id: 3122, name: "ЧИПСЫ SANCHO ВЕС", price: 50, oldPrice: null, volume: "92г", image: "https://bozorcom.ams3.cdn.digitaloceanspaces.com/media/products/chips.webp", discount: null },
+            
+            { id: 3123, name: "ЧИПСЫ ВЕСОВОЙ", price: 250, oldPrice: null, volume: "1кг", image: "https://www.auchan.ru/f/c/insecure/w:520/fn:date130420261621_474884_1/plain/https://www.auchan.ru/files/original/37333374/", discount: null },
+            { id: 3124, name: "ЧИПСЫ ВЕСОВОЙ", price: 100, oldPrice: null, volume: "400г", image: "https://www.auchan.ru/f/c/insecure/w:520/fn:date130420261621_474884_1/plain/https://www.auchan.ru/files/original/37333374/", discount: null },
+            { id: 3125, name: "ЧИПСЫ ВЕСОВОЙ", price: 50, oldPrice: null, volume: "200г", image: "https://www.auchan.ru/f/c/insecure/w:520/fn:date130420261621_474884_1/plain/https://www.auchan.ru/files/original/37333374/", discount: null },
+            { id: 3126, name: "ЧИПСЫ ВЕСОВОЙ", price: 20, oldPrice: null, volume: "80г", image: "https://www.auchan.ru/f/c/insecure/w:520/fn:date130420261621_474884_1/plain/https://www.auchan.ru/files/original/37333374/", discount: null },
+            
+            { id: 3127, name: "ХРУСТИМ ШАШЛЫК", price: 15, oldPrice: null, volume: "30г", image: "https://avatars.mds.yandex.net/i?id=b21fff395d0f2d986559ab39ddf723bd_l-5231880-images-thumbs&n=13", discount: null },
+            { id: 3128, name: "ХРУСТИМ СЫР", price: 15, oldPrice: null, volume: "30г", image: "https://basket-38.wbbasket.ru/vol8350/part835094/835094181/images/big/1.webp", discount: null },
+            { id: 3129, name: "ХРУСТИМ СМЕТАНА И ЗЕЛЕНЬ", price: 15, oldPrice: null, volume: "30г", image: "https://avatars.mds.yandex.net/i?id=da04aa4f81e8cfaa0549a9796ddcc08a_l-5844184-images-thumbs&n=13", discount: null },
+            
+            { id: 3130, name: "КИРЕШКИ KDV КОЛБАСА", price: 15, oldPrice: null, volume: "40г", image: "https://avatars.mds.yandex.net/i?id=0263cdf8d277163724ed609197c482fb_l-12749638-images-thumbs&n=13", discount: null },
+            { id: 3131, name: "КИРЕШКИ KDV КУРИЦА", price: 15, oldPrice: null, volume: "40г", image: "https://sibmarket24.ru/files/products/00001791.1024x768w.jpg", discount: null },
+            
+            { id: 3132, name: "КУКУРУЗ 777", price: 35, oldPrice: null, volume: "1шт", image: "https://ozan.com.tm/storage/product/18933/QnBgM5M8eOS5bVqo7CZOhS5hE3yvcf52LLRL12PF.jpg", discount: null },
+            { id: 3133, name: "КУКУРУЗ 777", price: 15, oldPrice: null, volume: "1шт", image: "https://mbgstore.uz/_next/image?url=https%3A%2F%2Fapi-dev.mbgstore.uz%2Fmedia%2Fproducts%2FIMG_1343_28.png&w=3840&q=75", discount: null }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('shop_products_chips')) || defaultProducts;
+        let clickCount = 0;
+        let isAdminActive = false;
+        let cart = JSON.parse(localStorage.getItem('asia_cart')) || {};
+
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        };
+
+        function saveCartToStorage() {
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
+        }
+
+        // Вход в админку по 5 кликам на заголовок
+        function checkAdminAccess() {
+            clickCount++;
+            if (clickCount >= 5) {
+                clickCount = 0;
+                const password = prompt("Введите пароль администратора:");
+                if (password === "484831") {
+                    isAdminActive = !isAdminActive;
+                    const panel = document.getElementById('adminPanel');
+                    const badge = document.getElementById('adminStatusBadge');
+                    const body = document.getElementById('bodyRoot');
+
+                    if (isAdminActive) {
+                        panel.classList.remove('hidden');
+                        badge.classList.remove('hidden');
+                        body.classList.add('admin-mode');
+                        alert("🔓 Админка включена! Теперь можно удалять товары крестиком и изменять их данные.");
+                    } else {
+                        panel.classList.add('hidden');
+                        badge.classList.add('hidden');
+                        body.classList.remove('admin-mode');
+                    }
+                    renderProducts();
+                } else if (password !== null) {
+                    alert("❌ Неверный пароль!");
+                }
+            }
+        }
+
+        function renderProducts(itemsToRender = products) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            itemsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between relative product-card";
+                card.setAttribute('data-name', product.name.toLowerCase());
+                
+                let currentQty = cart[product.id] ? cart[product.id].qty : 0;
+
+                card.innerHTML = `
+                    ${product.discount ? `<span class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full z-10">${product.discount}</span>` : ''}
+                    
+                    <!-- Кнопка удаления для админа -->
+                    <button onclick="deleteProduct(${product.id})" class="admin-only ${isAdminActive ? '' : 'hidden'} absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center z-20 shadow font-bold">✕</button>
+
+                    <div class="relative w-full h-32 mb-2 flex items-center justify-center bg-gray-50 rounded-xl overflow-hidden">
+                        <img src="${product.image || 'https://via.placeholder.com/300?text=Нет+фото'}" alt="${product.name}" class="max-h-full object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/300?text=Нет+фото';" ${isAdminActive ? `onclick="editProduct(${product.id}, 'image')" title="Кликните для смены картинки"` : ''}>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-base text-gray-900" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'price')"` : ''}>${product.price} сом</span>
+                            ${product.oldPrice ? `<span class="text-xs text-gray-400 line-through">${product.oldPrice} сом</span>` : ''}
+                        </div>
+                        <h3 class="text-xs text-gray-700 line-clamp-2 mt-1" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'name')"` : ''}>${product.name}</h3>
+                        <p class="text-[10px] text-gray-400 mt-0.5">${product.volume}</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-end mt-3">
+                        <div id="control-${product.id}">
+                            ${currentQty === 0 ? `
+                                <button onclick="changeQuantity(${product.id}, 1)" class="bg-gray-100 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition text-gray-800 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            ` : `
+                                <div class="flex items-center gap-1 bg-orange-500 text-white rounded-xl px-2 py-1 shadow-sm">
+                                    <button onclick="changeQuantity(${product.id}, -1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">-</button>
+                                    <span class="text-xs font-bold px-1">${currentQty}</span>
+                                    <button onclick="changeQuantity(${product.id}, 1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-orange-600 transition">+</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Управление количеством в корзине
+        function changeQuantity(id, delta) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (!cart[id]) {
+                cart[id] = { name: `${product.name} (${product.volume})`, price: product.price, volume: product.volume, qty: 0 };
+            }
+
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) {
+                delete cart[id];
+            }
+
+            renderProducts();
+            updateCartUI();
+            saveCartToStorage();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                totalCount += cart[id].qty;
+                totalPrice += cart[id].qty * cart[id].price;
+            }
+
+            let summaryElement = document.getElementById('cartSummaryText');
+            if (totalCount > 0) {
+                summaryElement.innerText = `${totalCount} тов. • ${totalPrice} сом`;
+            } else {
+                summaryElement.innerText = '0 сом';
+            }
+        }
+
+        // Добавление товара через админку
+        function addProduct(event) {
+            event.preventDefault();
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('prodName').value,
+                price: Number(document.getElementById('prodPrice').value),
+                oldPrice: document.getElementById('prodOldPrice').value ? Number(document.getElementById('prodOldPrice').value) : null,
+                volume: document.getElementById('prodVolume').value,
+                image: document.getElementById('prodImage').value,
+                discount: document.getElementById('prodDiscount').value || null
+            };
+
+            products.unshift(newProduct);
+            localStorage.setItem('shop_products_chips', JSON.stringify(products));
+            
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            alert('✅ Товар успешно добавлен в каталог!');
+        }
+
+        // Удаление товара в админке
+        function deleteProduct(id) {
+            if (confirm('Удалить этот товар из каталога?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('shop_products_chips', JSON.stringify(products));
+                if (cart[id]) {
+                    delete cart[id];
+                    updateCartUI();
+                    saveCartToStorage();
+                }
+                renderProducts();
+            }
+        }
+
+        // Редактирование товара по клику в админке
+        function editProduct(id, field) {
+            let product = products.find(p => p.id === id);
+            if (!product) return;
+
+            if (field === 'name') {
+                let newVal = prompt('Новое название товара:', product.name);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.name = newVal;
+                    if (cart[id]) cart[id].name = `${newVal} (${product.volume})`;
+                }
+            } else if (field === 'price') {
+                let newVal = prompt('Новая цена в сомах:', product.price);
+                if (newVal !== null && !isNaN(newVal) && newVal.trim() !== '') {
+                    product.price = Number(newVal);
+                    if (cart[id]) cart[id].price = Number(newVal);
+                    updateCartUI();
+                }
+            } else if (field === 'image') {
+                let newVal = prompt('Новая ссылка на картинку:', product.image);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.image = newVal;
+                }
+            }
+
+            localStorage.setItem('shop_products_chips', JSON.stringify(products));
+            saveCartToStorage();
+            renderProducts();
+        }
+
+        // Фильтрация (быстрый поиск)
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.volume.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+    </script>
+</body>
+</html>

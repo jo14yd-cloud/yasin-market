@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Семечки - ЯСИН</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .admin-mode [data-editable] {
+            cursor: pointer;
+            border: 1px dashed #f97316;
+            padding: 2px 4px;
+            border-radius: 6px;
+            background-color: #eff6ff;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-28" id="bodyRoot">
+
+    <!-- 1. ШАПКА СТРАНИЦЫ -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-md mx-auto flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <a href="index.html" class="flex items-center gap-1 text-sm font-bold text-blue-500 hover:text-blue-600 transition">
+                    ← Назад
+                </a>
+                <!-- Клик 5 раз по заголовку открывает админку -->
+                <h1 id="adminTrigger" onclick="checkAdminAccess()" class="font-bold text-base text-gray-900 leading-tight cursor-pointer select-none text-center">Семечки 🌻</h1>
+                <div id="adminStatusBadge" class="hidden text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">Админка ВКЛ</div>
+            </div>
+
+            <!-- Строка поиска по разделу -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="filterProducts()"
+                    placeholder="Поиск семечек..." 
+                    class="w-full bg-gray-100 text-gray-800 text-sm rounded-2xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                >
+            </div>
+
+        </div>
+    </header>
+
+    <!-- 2. СКРЫТАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="adminPanel" class="hidden max-w-md mx-auto my-4 p-4 bg-white rounded-2xl shadow-md border border-blue-200 mx-4">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-base text-blue-600">➕ Добавить новый товар</h2>
+            <button onclick="checkAdminAccess()" class="text-xs text-red-500 font-bold">Закрыть</button>
+        </div>
+        <form id="addProductForm" onsubmit="addProduct(event)" class="flex flex-col gap-3">
+            <input type="text" id="prodName" placeholder="Название (например, СЕМЕЧКИ)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="number" id="prodPrice" placeholder="Цена в сомах" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <input type="text" id="prodImage" placeholder="Ссылка на изображение (URL)" required class="bg-gray-50 border p-2 rounded-xl text-sm">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-xl transition text-sm">Опубликовать товар</button>
+        </form>
+    </div>
+
+    <!-- 3. КАТАЛОГ ТОВАРОВ -->
+    <main class="max-w-md mx-auto p-4">
+        <h2 class="font-bold text-lg mb-3">Ассортимент</h2>
+        <div id="productsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Динамические товары -->
+        </div>
+    </main>
+
+    <!-- 4. НИЖНЯЯ ПЛАВАЮЩАЯ КОРЗИНА -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/90 backdrop-blur-md border-t flex flex-col items-center gap-1 z-40">
+        <a href="korzina.html" onclick="saveCartToStorage()" class="w-full max-w-md bg-yellow-400 hover:bg-yellow-500 font-bold py-3 px-5 rounded-2xl shadow-lg flex items-center justify-between transition text-gray-900">
+            <span id="cartSummaryText" class="text-base font-extrabold">0 сом</span>
+            <span class="flex items-center gap-2 text-sm">
+                Перейти в корзину 🛒
+            </span>
+        </a>
+    </div>
+
+    <!-- 5. СКРИПТЫ УПРАВЛЕНИЯ -->
+    <script>
+        let clickCount = 0;
+        let isAdminActive = false;
+        let cart = JSON.parse(localStorage.getItem('asia_cart')) || {};
+
+        // Базовые товары для раздела семечек
+        let seedsProducts = JSON.parse(localStorage.getItem('yasyn_seeds_products')) || [
+            { id: 1, name: "СЕМЕЧКИ СОЛЕНЫЕ 2кг", price: 500, image: "https://babymarket.uz/wp-content/uploads/2021/08/mega-semechki-solenye-100gr.jpg" },
+            { id: 2, name: "СЕМЕЧКИ СОЛЕНЫЕ 1кг", price: 300, image: "https://avatars.mds.yandex.net/get-mpic/11401175/2a0000018c0f8b1224f51f56a9edf21e6b52/orig" },
+            { id: 3, name: "СЕМЕЧКИ СОЛЕНЫЕ 670г", price: 200, image: "https://avatars.mds.yandex.net/get-mpic/11401175/2a0000018c0f8b1224f51f56a9edf21e6b52/orig" },
+            { id: 4, name: "СЕМЕЧКИ СОЛЕНЫЕ 335г", price: 100, image: "https://avatars.mds.yandex.net/get-mpic/11401175/2a0000018c0f8b1224f51f56a9edf21e6b52/orig" },
+            { id: 5, name: "СЕМЕЧКИ СОЛЕНЫЕ 170г", price: 50, image: "https://avatars.mds.yandex.net/get-mpic/11401175/2a0000018c0f8b1224f51f56a9edf21e6b52/orig" },
+            { id: 6, name: "ДЖИН ВЕЛИКАН СОЛЕНЫЕ 300г", price: 220, image: "https://basket-41.wbbasket.ru/vol9945/part994543/994543009/images/big/1.webp" },
+            { id: 7, name: "ДЖИН ВЕЛИКАН СОЛЕНЫЕ 200г", price: 150, image: "https://irecommend.ru/sites/default/files/product-images/2511032/3CXwc0zNl5RI8s9CpdKuIw.jpg" },
+            { id: 8, name: "ДЖИН ВЕЛИКАН СОЛЕНЫЕ 100г", price: 80, image: "https://ir.ozone.ru/s3/multimedia-1-j/7797871495.jpg" },
+            { id: 9, name: "ДЖИН ВЕЛИКАН СОЛНЕЧНЫЙ 300г", price: 220, image: "https://basket-41.wbbasket.ru/vol9945/part994542/994542996/images/big/1.webp" },
+            { id: 10, name: "ДЖИН ВЕЛИКАН СОЛНЕЧНЫЙ 200г", price: 150, image: "https://avatars.mds.yandex.net/i?id=ca05aa3fbd52a7a0fe0d6c05aff40ab0_l-8497946-images-thumbs&ref=rim&n=13&w=1000&h=1000" },
+            { id: 11, name: "ДЖИН ВЕЛИКАН СОЛНЕЧНЫЙ 100г", price: 80, image: "https://basket-41.wbbasket.ru/vol10029/part1002905/1002905049/images/big/1.webp" },
+            { id: 12, name: "ДЖИН СОЛЕНЫЕ 250г", price: 170, image: "https://static.ayanmarket.kz/products/images/image_2025-02-06-17-56-59_%D1%81%D0%BE%D0%BC%D0%BE.png" },
+            { id: 13, name: "ДЖИН СОЛЕНЫЕ 140г", price: 100, image: "https://static.ayanmarket.kz/products/images/image_2025-02-06-17-56-59_%D1%81%D0%BE%D0%BC%D0%BE.png" },
+            { id: 14, name: "ДЖИН ВЕЛИКАН СОЛЕНЫЕ 70г", price: 55, image: "https://static.ayanmarket.kz/products/images/image_2025-02-06-17-56-59_%D1%81%D0%BE%D0%BC%D0%BE.png" },
+            { id: 15, name: "ДЖИН ОБЖАРКИ 250г", price: 170, image: "https://melmak.ru/pictures/product/big/4196_big.JPG" },
+            { id: 16, name: "ДЖИН ОБЖАРКИ 140г", price: 100, image: "https://melmak.ru/pictures/product/big/4196_big.JPG" },
+            { id: 17, name: "ДЖИН ОБЖАРКИ 70г", price: 55, image: "https://melmak.ru/pictures/product/big/4196_big.JPG" },
+            { id: 18, name: "МАСТЕР СЕМЕЧКИ 250г", price: 80, image: "https://avatars.mds.yandex.net/i?id=85b7a602ff17d93388b596bab1d69d5a_l-5243975-images-thumbs&n=13" },
+            { id: 19, name: "МАСТЕР СЕМЕЧКИ 140г", price: 55, image: "https://avatars.mds.yandex.net/i?id=85b7a602ff17d93388b596bab1d69d5a_l-5243975-images-thumbs&n=13" },
+            { id: 20, name: "МАСТЕР СЕМЕЧКИ 70г", price: 30, image: "https://avatars.mds.yandex.net/i?id=85b7a602ff17d93388b596bab1d69d5a_l-5243975-images-thumbs&n=13" },
+            { id: 21, name: "БАБКИНЫ СЕМЕЧКИ 300г", price: 130, image: "https://avatars.mds.yandex.net/get-mpic/11563949/2a0000018c0615457edfb26ae46bf6a1310c/orig" },
+            { id: 22, name: "БАБКИНЫ СЕМЕЧКИ СОЛЕНЫЕ 90г", price: 55, image: "https://avatars.mds.yandex.net/get-mpic/20811646/2a0000019f2b79e9103b16ff701de93f020e/orig" },
+            { id: 23, name: "БАБКИНЫ СЕМЕЧКИ 90г", price: 55, image: "https://ir.ozone.ru/s3/multimedia-1-n/11054516171.jpg" },
+            { id: 24, name: "ERMAK СОЛЕНЫЕ 200г", price: 170, image: "https://ermak.uz/media/products/200_g_qora_pista_tuz.jpg" },
+            { id: 25, name: "ERMAK СОЛЕНЫЕ 150г", price: 140, image: "https://yastatic.net/avatars/get-grocery-goods/2750890/b051a306-2d75-47dd-aadd-528133f600f1/600x600?webp=true" },
+            { id: 26, name: "ERMAK СОЛЕНЫЕ 100г", price: 90, image: "https://ermak.uz/media/products/100-TUZLANGAN.png" }
+        ];
+
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        };
+
+        function saveCartToStorage() {
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
+        }
+
+        // Вход в админку по 5 кликам по заголовку
+        function checkAdminAccess() {
+            clickCount++;
+            if (clickCount >= 5) {
+                clickCount = 0;
+                const password = prompt("Введите пароль администратора ");
+                if (password === "484831") {
+                    isAdminActive = !isAdminActive;
+                    const panel = document.getElementById('adminPanel');
+                    const badge = document.getElementById('adminStatusBadge');
+                    const body = document.getElementById('bodyRoot');
+
+                    if (isAdminActive) {
+                        panel.classList.remove('hidden');
+                        badge.classList.remove('hidden');
+                        body.classList.add('admin-mode');
+                        alert("🔓 Админка включена! Теперь можно удалять товары и изменять цены/названия по клику.");
+                    } else {
+                        panel.classList.add('hidden');
+                        badge.classList.add('hidden');
+                        body.classList.remove('admin-mode');
+                    }
+                    renderProducts();
+                } else if (password !== null) {
+                    alert("❌ Неверный пароль!");
+                }
+            }
+        }
+
+        function renderProducts(itemsToRender = seedsProducts) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            itemsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between relative product-card";
+                
+                let currentQty = cart[product.name] ? cart[product.name].qty : 0;
+
+                card.innerHTML = `
+                    <!-- Кнопка удаления для админа -->
+                    <button onclick="deleteProduct(${product.id})" class="admin-only ${isAdminActive ? '' : 'hidden'} absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center z-20 shadow font-bold">✕</button>
+
+                    <div class="relative w-full h-32 mb-2 flex items-center justify-center">
+                        <img src="${product.image}" alt="${product.name}" class="max-h-full object-contain rounded-xl" ${isAdminActive ? `onclick="editProduct(${product.id}, 'image')" title="Кликните для смены картинки"` : ''}>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-bold text-base text-gray-900" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'price')"` : ''}>${product.price} сом</span>
+                        </div>
+                        <h3 class="text-xs text-gray-700 line-clamp-2 mt-1" ${isAdminActive ? `data-editable onclick="editProduct(${product.id}, 'name')"` : ''}>${product.name}</h3>
+                    </div>
+                    
+                    <div class="flex items-center justify-end mt-3">
+                        <div id="control-${product.id}">
+                            ${currentQty === 0 ? `
+                                <button onclick="changeQuantity(${product.id}, 1)" class="bg-gray-100 hover:bg-blue-500 hover:text-white p-2 rounded-xl transition text-gray-800 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            ` : `
+                                <div class="flex items-center gap-1 bg-blue-500 text-white rounded-xl px-2 py-1 shadow-sm">
+                                    <button onclick="changeQuantity(${product.id}, -1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-blue-600 transition">-</button>
+                                    <span class="text-xs font-bold px-1">${currentQty}</span>
+                                    <button onclick="changeQuantity(${product.id}, 1)" class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-sm hover:bg-blue-600 transition">+</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function changeQuantity(id, delta) {
+            let product = seedsProducts.find(p => p.id === id);
+            if (!product) return;
+
+            if (!cart[product.name]) {
+                cart[product.name] = { name: product.name, price: product.price, volume: "1шт", image: product.image, qty: 0 };
+            }
+
+            cart[product.name].qty += delta;
+            if (cart[product.name].qty <= 0) {
+                delete cart[product.name];
+            }
+
+            renderProducts();
+            updateCartUI();
+            saveCartToStorage();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let key in cart) {
+                totalCount += cart[key].qty;
+                totalPrice += cart[key].qty * cart[key].price;
+            }
+
+            let summaryElement = document.getElementById('cartSummaryText');
+            if (totalCount > 0) {
+                summaryElement.innerText = `${totalCount} тов. • ${totalPrice} сом`;
+            } else {
+                summaryElement.innerText = '0 сом';
+            }
+        }
+
+        function addProduct(event) {
+            event.preventDefault();
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('prodName').value,
+                price: Number(document.getElementById('prodPrice').value),
+                image: document.getElementById('prodImage').value
+            };
+
+            seedsProducts.unshift(newProduct);
+            localStorage.setItem('yasyn_seeds_products', JSON.stringify(seedsProducts));
+            
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            alert('✅ Товар успешно добавлен в каталог!');
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Удалить этот товар из каталога?')) {
+                let product = seedsProducts.find(p => p.id === id);
+                seedsProducts = seedsProducts.filter(p => p.id !== id);
+                localStorage.setItem('yasyn_seeds_products', JSON.stringify(seedsProducts));
+                if (product && cart[product.name]) {
+                    delete cart[product.name];
+                    updateCartUI();
+                    saveCartToStorage();
+                }
+                renderProducts();
+            }
+        }
+
+        function editProduct(id, field) {
+            let product = seedsProducts.find(p => p.id === id);
+            if (!product) return;
+
+            let oldNameKey = product.name;
+
+            if (field === 'name') {
+                let newVal = prompt('Новое название товара:', product.name);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.name = newVal;
+                    if (cart[oldNameKey]) {
+                        cart[newVal] = cart[oldNameKey];
+                        cart[newVal].name = newVal;
+                        delete cart[oldNameKey];
+                    }
+                }
+            } else if (field === 'price') {
+                let newVal = prompt('Новая цена в сомах:', product.price);
+                if (newVal !== null && !isNaN(newVal) && newVal.trim() !== '') {
+                    product.price = Number(newVal);
+                    if (cart[product.name]) cart[product.name].price = Number(newVal);
+                    updateCartUI();
+                }
+            } else if (field === 'image') {
+                let newVal = prompt('Новая ссылка на картинку:', product.image);
+                if (newVal !== null && newVal.trim() !== '') {
+                    product.image = newVal;
+                    if (cart[product.name]) cart[product.name].image = newVal;
+                }
+            }
+
+            localStorage.setItem('yasyn_seeds_products', JSON.stringify(seedsProducts));
+            saveCartToStorage();
+            renderProducts();
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = seedsProducts.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+    </script>
+</body>
+</html>
