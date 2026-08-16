@@ -93,20 +93,20 @@
 
         // Базовые товары для раздела «Сгущенка»
         let sugshenkaProducts = JSON.parse(localStorage.getItem('yasyn_sugshenka_products')) || [
-            { id: 1, name: "СУГЩЁНКА ИЧНЯ 900г", price: 240, oldPrice: null, volume: "900г", image: "https://strgimgr.umico.az/img/product/1680/c6d5834d-79a0-4c0d-8711-5e686b66489e.jpeg", discount: null },
-            { id: 2, name: "СУГЩЁНКА ИЧНЯ 450г", price: 150, oldPrice: null, volume: "450г", image: "https://strgimgr.umico.az/img/product/1680/c6d5834d-79a0-4c0d-8711-5e686b66489e.jpeg", discount: null },
-            { id: 3, name: "СУГЩЁНКА 8,5% 1000г", price: 220, oldPrice: null, volume: "1000г", image: "https://basket-41.wbbasket.ru/vol10355/part1035582/1035582055/images/big/1.webp", discount: null },
-            { id: 4, name: "СУГЩЁНКА 2,5% 800г", price: 120, oldPrice: null, volume: "800г", image: "https://ftk.komos.ru/upload/dev2fun.imagecompress/webp/iblock/c47/r7dqvevy823w7vcpvfygu5bij0ur1zem.webp", discount: null },
-            { id: 5, name: "СУГЩЁНКА 8,5% 430г", price: 110, oldPrice: null, volume: "430г", image: "https://main-cdn.sbermegamarket.ru/hlr-system/720/547/202/614/48/100030449274b0.jpeg", discount: null },
-            { id: 6, name: "СУГЩЁНКА СЛАДАНЕЖ КЛУБНИКА 500г", price: 150, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/get-mpic/18473042/2a0000019cb7eeb36bf21175e8357dea65a6/orig", discount: null },
-            { id: 7, name: "СУГЩЁНКА СЛАДАНЕЖ БАНАН 500г", price: 150, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/get-mpic/18491125/2a0000019cb7ee69111debbb8ed820ad7d33/orig", discount: null },
-            { id: 8, name: "СУГЩЁНКА СЛАДАНЕЖ ШОКОЛАД 500г", price: 150, oldPrice: null, volume: "500г", image: "https://почтасизо.рф/uploads/product/600/630/var_2024-11-26_08-00-05.jpg", discount: null },
-            { id: 9, name: "СУГЩЁНКА 3 ЖЕЛАНИЯ 270г", price: 110, oldPrice: null, volume: "270г", image: "https://eldala.kz/uploads/all/bd/17/b9/bd17b9d1a736515169b8d095224d7a57.jpg", discount: null },
-            { id: 10, name: "СУГЩЁНКА 3 ЖЕЛАНИЯ ЖБ 360г", price: 100, oldPrice: null, volume: "360г ЖБ", image: "https://dana-market.kz/upload/iblock/09b/01fos4ubvbc1ryxmn0ay5apyhoefugsl.webp", discount: null },
-            { id: 11, name: "СУГЩЁНКА 2,5% ЖБ 360г", price: 65, oldPrice: null, volume: "360г ЖБ", image: "https://foodsprice.ru/icache/product/525/5253737_800x600.jpg", discount: null },
-            { id: 12, name: "СУГЩЁНКА ИРИСКА ЖБ 370г", price: 140, oldPrice: null, volume: "370г ЖБ", image: "https://resources.cdn-kaspi.kz/img/m/p/h00/h8d/64151013359646.jpg?format=gallery-large", discount: null },
-            { id: 13, name: "СУГЩЁНКА ВАРЕНАЯ ЖБ 380г", price: 120, oldPrice: null, volume: "380г ЖБ", image: "https://main-cdn.sbermegamarket.ru/big1/hlr-system/1666577/100023385069b0.jpg", discount: null },
-            { id: 14, name: "СУГЩЁНКА ВАРЕНАЯ 900г", price: 240, oldPrice: null, volume: "900г", image: "https://avatars.mds.yandex.net/i?id=b1876dfc14198d23229a6f02c8aba4a5_l-5669589-images-thumbs&n=13", discount: null }
+            { id: 80, name: "СУГЩЁНКА ИЧНЯ 900г", price: 240, oldPrice: null, volume: "900г", image: "https://strgimgr.umico.az/img/product/1680/c6d5834d-79a0-4c0d-8711-5e686b66489e.jpeg", discount: null },
+            { id: 81, name: "СУГЩЁНКА ИЧНЯ 450г", price: 150, oldPrice: null, volume: "450г", image: "https://strgimgr.umico.az/img/product/1680/c6d5834d-79a0-4c0d-8711-5e686b66489e.jpeg", discount: null },
+            { id: 82, name: "СУГЩЁНКА 8,5% 1000г", price: 220, oldPrice: null, volume: "1000г", image: "https://basket-41.wbbasket.ru/vol10355/part1035582/1035582055/images/big/1.webp", discount: null },
+            { id: 83, name: "СУГЩЁНКА 2,5% 800г", price: 120, oldPrice: null, volume: "800г", image: "https://ftk.komos.ru/upload/dev2fun.imagecompress/webp/iblock/c47/r7dqvevy823w7vcpvfygu5bij0ur1zem.webp", discount: null },
+            { id: 84, name: "СУГЩЁНКА 8,5% 430г", price: 110, oldPrice: null, volume: "430г", image: "https://main-cdn.sbermegamarket.ru/hlr-system/720/547/202/614/48/100030449274b0.jpeg", discount: null },
+            { id: 85, name: "СУГЩЁНКА СЛАДАНЕЖ КЛУБНИКА 500г", price: 150, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/get-mpic/18473042/2a0000019cb7eeb36bf21175e8357dea65a6/orig", discount: null },
+            { id: 86, name: "СУГЩЁНКА СЛАДАНЕЖ БАНАН 500г", price: 150, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/get-mpic/18491125/2a0000019cb7ee69111debbb8ed820ad7d33/orig", discount: null },
+            { id: 87, name: "СУГЩЁНКА СЛАДАНЕЖ ШОКОЛАД 500г", price: 150, oldPrice: null, volume: "500г", image: "https://почтасизо.рф/uploads/product/600/630/var_2024-11-26_08-00-05.jpg", discount: null },
+            { id: 88, name: "СУГЩЁНКА 3 ЖЕЛАНИЯ 270г", price: 110, oldPrice: null, volume: "270г", image: "https://eldala.kz/uploads/all/bd/17/b9/bd17b9d1a736515169b8d095224d7a57.jpg", discount: null },
+            { id: 89, name: "СУГЩЁНКА 3 ЖЕЛАНИЯ ЖБ 360г", price: 100, oldPrice: null, volume: "360г ЖБ", image: "https://dana-market.kz/upload/iblock/09b/01fos4ubvbc1ryxmn0ay5apyhoefugsl.webp", discount: null },
+            { id: 90, name: "СУГЩЁНКА 2,5% ЖБ 360г", price: 65, oldPrice: null, volume: "360г ЖБ", image: "https://foodsprice.ru/icache/product/525/5253737_800x600.jpg", discount: null },
+            { id: 91, name: "СУГЩЁНКА ИРИСКА ЖБ 370г", price: 140, oldPrice: null, volume: "370г ЖБ", image: "https://resources.cdn-kaspi.kz/img/m/p/h00/h8d/64151013359646.jpg?format=gallery-large", discount: null },
+            { id: 92, name: "СУГЩЁНКА ВАРЕНАЯ ЖБ 380г", price: 120, oldPrice: null, volume: "380г ЖБ", image: "https://main-cdn.sbermegamarket.ru/big1/hlr-system/1666577/100023385069b0.jpg", discount: null },
+            { id: 93, name: "СУГЩЁНКА ВАРЕНАЯ 900г", price: 240, oldPrice: null, volume: "900г", image: "https://avatars.mds.yandex.net/i?id=b1876dfc14198d23229a6f02c8aba4a5_l-5669589-images-thumbs&n=13", discount: null }
         ];
 
         window.onload = function() {
