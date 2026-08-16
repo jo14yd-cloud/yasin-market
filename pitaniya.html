@@ -93,30 +93,30 @@
 
         // Базовые товары для раздела «Детское питание»
         let babyFoodProducts = JSON.parse(localStorage.getItem('yasyn_baby_products')) || [
-            { id: 1, name: "NAN 1 800g", price: 1300, oldPrice: null, volume: "800g", image: "https://avatars.mds.yandex.net/i?id=65a0d8f2605c169285b2c66f9343e6b4_l-4575666-images-thumbs&n=13", discount: null },
-            { id: 2, name: "NAN 2 800g", price: 1300, oldPrice: null, volume: "800g", image: "https://basket-05.wbbasket.ru/vol922/part92274/92274443/images/big/1.webp", discount: null },
-            { id: 3, name: "NAN 3 800g", price: 1600, oldPrice: null, volume: "800g", image: "https://avatars.mds.yandex.net/get-eda/14739469/1b6469ab612f850e09e2f9e24c6bd74b/orig", discount: null },   
-            { id: 6, name: "NAN 3 400g", price: 900, oldPrice: null, volume: "400g", image: "https://basket-12.wbbasket.ru/vol1721/part172144/172144893/images/big/1.webp", discount: null },
-            { id: 7, name: "NUTRILAK 1 600g", price: 750, oldPrice: null, volume: "600g", image: "https://sklad-zdorovo.ru/images/goods/31325_nutrilak_premium_1_s_rozhdeniya_suhaya_smesj_600g.jpg", discount: null },
-            { id: 8, name: "NUTRILAK 2 600g", price: 750, oldPrice: null, volume: "600g", image: "https://butuz.kz/image/cache/catalog/scif1_orig/spr_noms/11/11464-1200x630.jpg", discount: null },
-            { id: 9, name: "NUTRILAK 3 600g", price: 750, oldPrice: null, volume: "600g", image: "https://cdn1.youla.io/files/images/720_720_out/68/9a/689ab58820d2255228048f34-2.jpg", discount: null },
-            { id: 10, name: "NUTRILAK 1 300g", price: 430, oldPrice: null, volume: "300g", image: "https://butuz.kz/image/cache/catalog/scif1_orig/spr_noms/11/11452-1200x630.jpg", discount: null },
-            { id: 11, name: "NUTRILAK 2 300g", price: 430, oldPrice: null, volume: "300g", image: "https://cdn.rigla.ru/media/catalog/product/cache/afad95d7734d2fa6d0a8ba78597182b7/1/1/115640-8-6-1-2-86123d379efbbe35fb0b42eab0da6a982b9e233e_115640.jpg", discount: null },
-            { id: 12, name: "NUTRILAK 3 300g", price: 430, oldPrice: null, volume: "300g", image: "https://media.uteka.ru/media/768/3/d5/3d5d57d210986db1a7ccf35457e0b781.jpg", discount: null },
-            { id: 13, name: "NUTRILAK 1 600g", price: 550, oldPrice: null, volume: "600g", image: "https://cdn.rigla.ru/media/catalog/product/cache/afad95d7734d2fa6d0a8ba78597182b7/4/9/4992100-0-b-c-3-0bc3b75547b1a54260705ff5f14db6bae55aefdf_4992100.jpg", discount: null },
-            { id: 14, name: "NUTRILAK 2 600g", price: 550, oldPrice: null, volume: "600g", image: "https://media.uteka.ru/media/big/b/f9/bf962c0d24c55d5c651be9bc166c7974.jpg", discount: null },
-            { id: 15, name: "NUTRILAK 3 600g", price: 550, oldPrice: null, volume: "600g", image: "https://avatars.mds.yandex.net/i?id=4ee13af7be9ee20651f090a56141dc60_l-10599899-images-thumbs&n=13", discount: null },
-            { id: 16, name: "NUTRILAK 1 300g", price: 320, oldPrice: null, volume: "300g", image: "https://cdn.deshapt.ru/assets/thumbnails/3a/3a521c4b754154605a2c7f0019b0601e.jpg", discount: null },
-            { id: 17, name: "NUTRILAK 2 300g", price: 320, oldPrice: null, volume: "300g", image: "https://media.uteka.ru/media/big/b/f9/bf962c0d24c55d5c651be9bc166c7974.jpg", discount: null },
-            { id: 18, name: "NUTRILAK 3 300g", price: 320, oldPrice: null, volume: "300g", image: "https://avatars.mds.yandex.net/i?id=c8010fafccb71c176322fe77ff5bdad8_sr-12421362-images-thumbs&n=13", discount: null },
-            { id: 19, name: "NESTOGEN 1 1050g", price: 1150, oldPrice: null, volume: "1050g", image: "https://damcdn.samokat.ru/dam-storage-ext-env-prod/2026/01/bd165910-8556-4fe6-bb54-bfc7647ee8cb", discount: null },
-            { id: 20, name: "NESTOGEN 2 1050g", price: 1150, oldPrice: null, volume: "1050g", image: "https://avatars.mds.yandex.net/i?id=0be909090b2d7240ead8bc04aef1eef0cfefcd21-9291097-images-thumbs&ref=rim&n=33&w=300&h=300", discount: null },
-            { id: 21, name: "NESTOGEN 3 1050g", price: 1150, oldPrice: null, volume: "1050g", image: "https://damcdn.samokat.ru/dam-storage-ext-env-prod/2026/01/b3787559-aac4-4128-a9ae-fc94d99caa5c", discount: null },
-            { id: 22, name: "NESTOGEN 1 300g", price: 450, oldPrice: null, volume: "300g", image: "https://avatars.mds.yandex.net/i?id=37c9986e8decfbc9a02725fb7e3166a6_l-4982359-images-thumbs&n=13", discount: null },
-            { id: 23, name: "NESTOGEN 2 300g", price: 450, oldPrice: null, volume: "300g", image: "https://tornado.shop/images/detailed/22/P1286192.jpg", discount: null },
-            { id: 24, name: "NESTOGEN 3 300g", price: 450, oldPrice: null, volume: "300g", image: "https://avatars.mds.yandex.net/get-mpic/20043823/2a0000019dfdcdf2ab6cecb2f943c34ac6dd/orig", discount: null },
-            { id: 25, name: "NESTLE KASHA 200g", price: 240, oldPrice: null, volume: "200g", image: "https://avatars.mds.yandex.net/i?id=6d4a1fad3941db34e03ae0ab91d4ce1074076c18-5337213-images-thumbs&n=13", discount: null },
-            { id: 26, name: "ФРУТО НЯНЯ 200g", price: 240, oldPrice: null, volume: "200g", image: "https://avatars.mds.yandex.net/i?id=f62f6db0bb077cb3d434991303a3964e0939a5be-5289438-images-thumbs&n=13", discount: null }
+            { id: 102, name: "NAN 1 800g", price: 1300, oldPrice: null, volume: "800g", image: "https://avatars.mds.yandex.net/i?id=65a0d8f2605c169285b2c66f9343e6b4_l-4575666-images-thumbs&n=13", discount: null },
+            { id: 103, name: "NAN 2 800g", price: 1300, oldPrice: null, volume: "800g", image: "https://basket-05.wbbasket.ru/vol922/part92274/92274443/images/big/1.webp", discount: null },
+            { id: 104, name: "NAN 3 800g", price: 1600, oldPrice: null, volume: "800g", image: "https://avatars.mds.yandex.net/get-eda/14739469/1b6469ab612f850e09e2f9e24c6bd74b/orig", discount: null },   
+            { id: 105, name: "NAN 3 400g", price: 900, oldPrice: null, volume: "400g", image: "https://basket-12.wbbasket.ru/vol1721/part172144/172144893/images/big/1.webp", discount: null },
+            { id: 106, name: "NUTRILAK 1 600g", price: 750, oldPrice: null, volume: "600g", image: "https://sklad-zdorovo.ru/images/goods/31325_nutrilak_premium_1_s_rozhdeniya_suhaya_smesj_600g.jpg", discount: null },
+            { id: 107, name: "NUTRILAK 2 600g", price: 750, oldPrice: null, volume: "600g", image: "https://butuz.kz/image/cache/catalog/scif1_orig/spr_noms/11/11464-1200x630.jpg", discount: null },
+            { id: 108, name: "NUTRILAK 3 600g", price: 750, oldPrice: null, volume: "600g", image: "https://cdn1.youla.io/files/images/720_720_out/68/9a/689ab58820d2255228048f34-2.jpg", discount: null },
+            { id: 109, name: "NUTRILAK 1 300g", price: 430, oldPrice: null, volume: "300g", image: "https://butuz.kz/image/cache/catalog/scif1_orig/spr_noms/11/11452-1200x630.jpg", discount: null },
+            { id: 110, name: "NUTRILAK 2 300g", price: 430, oldPrice: null, volume: "300g", image: "https://cdn.rigla.ru/media/catalog/product/cache/afad95d7734d2fa6d0a8ba78597182b7/1/1/115640-8-6-1-2-86123d379efbbe35fb0b42eab0da6a982b9e233e_115640.jpg", discount: null },
+            { id: 111, name: "NUTRILAK 3 300g", price: 430, oldPrice: null, volume: "300g", image: "https://media.uteka.ru/media/768/3/d5/3d5d57d210986db1a7ccf35457e0b781.jpg", discount: null },
+            { id: 112, name: "NUTRILAK 1 600g", price: 550, oldPrice: null, volume: "600g", image: "https://cdn.rigla.ru/media/catalog/product/cache/afad95d7734d2fa6d0a8ba78597182b7/4/9/4992100-0-b-c-3-0bc3b75547b1a54260705ff5f14db6bae55aefdf_4992100.jpg", discount: null },
+            { id: 113, name: "NUTRILAK 2 600g", price: 550, oldPrice: null, volume: "600g", image: "https://media.uteka.ru/media/big/b/f9/bf962c0d24c55d5c651be9bc166c7974.jpg", discount: null },
+            { id: 114, name: "NUTRILAK 3 600g", price: 550, oldPrice: null, volume: "600g", image: "https://avatars.mds.yandex.net/i?id=4ee13af7be9ee20651f090a56141dc60_l-10599899-images-thumbs&n=13", discount: null },
+            { id: 115, name: "NUTRILAK 1 300g", price: 320, oldPrice: null, volume: "300g", image: "https://cdn.deshapt.ru/assets/thumbnails/3a/3a521c4b754154605a2c7f0019b0601e.jpg", discount: null },
+            { id: 116, name: "NUTRILAK 2 300g", price: 320, oldPrice: null, volume: "300g", image: "https://media.uteka.ru/media/big/b/f9/bf962c0d24c55d5c651be9bc166c7974.jpg", discount: null },
+            { id: 117, name: "NUTRILAK 3 300g", price: 320, oldPrice: null, volume: "300g", image: "https://avatars.mds.yandex.net/i?id=c8010fafccb71c176322fe77ff5bdad8_sr-12421362-images-thumbs&n=13", discount: null },
+            { id: 118, name: "NESTOGEN 1 1050g", price: 1150, oldPrice: null, volume: "1050g", image: "https://damcdn.samokat.ru/dam-storage-ext-env-prod/2026/01/bd165910-8556-4fe6-bb54-bfc7647ee8cb", discount: null },
+            { id: 119, name: "NESTOGEN 2 1050g", price: 1150, oldPrice: null, volume: "1050g", image: "https://avatars.mds.yandex.net/i?id=0be909090b2d7240ead8bc04aef1eef0cfefcd21-9291097-images-thumbs&ref=rim&n=33&w=300&h=300", discount: null },
+            { id: 120, name: "NESTOGEN 3 1050g", price: 1150, oldPrice: null, volume: "1050g", image: "https://damcdn.samokat.ru/dam-storage-ext-env-prod/2026/01/b3787559-aac4-4128-a9ae-fc94d99caa5c", discount: null },
+            { id: 121, name: "NESTOGEN 1 300g", price: 450, oldPrice: null, volume: "300g", image: "https://avatars.mds.yandex.net/i?id=37c9986e8decfbc9a02725fb7e3166a6_l-4982359-images-thumbs&n=13", discount: null },
+            { id: 122, name: "NESTOGEN 2 300g", price: 450, oldPrice: null, volume: "300g", image: "https://tornado.shop/images/detailed/22/P1286192.jpg", discount: null },
+            { id: 123, name: "NESTOGEN 3 300g", price: 450, oldPrice: null, volume: "300g", image: "https://avatars.mds.yandex.net/get-mpic/20043823/2a0000019dfdcdf2ab6cecb2f943c34ac6dd/orig", discount: null },
+            { id: 124, name: "NESTLE KASHA 200g", price: 240, oldPrice: null, volume: "200g", image: "https://avatars.mds.yandex.net/i?id=6d4a1fad3941db34e03ae0ab91d4ce1074076c18-5337213-images-thumbs&n=13", discount: null },
+            { id: 125, name: "ФРУТО НЯНЯ 200g", price: 240, oldPrice: null, volume: "200g", image: "https://avatars.mds.yandex.net/i?id=f62f6db0bb077cb3d434991303a3964e0939a5be-5289438-images-thumbs&n=13", discount: null }
         ];
 
         window.onload = function() {
@@ -125,7 +125,7 @@
         };
 
         function saveCartToStorage() {
-            localStorage.setItem('pitania_cart', JSON.stringify(cart));
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
         }
 
         // Вход в админку по 5 кликам по названию «Детское питание 🍼»
