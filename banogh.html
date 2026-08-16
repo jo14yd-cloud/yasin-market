@@ -93,41 +93,41 @@
 
         // Базовые товары для раздела энергетиков и напитков
         let drinksProducts = JSON.parse(localStorage.getItem('yasyn_drinks_products')) || [
-            { id: 1, name: "NITRO GREEN ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/5216590/img_id362706678678697277.jpeg/orig", discount: null },
-            { id: 2, name: "NITRO EXTREME ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-v/6271696279.jpg", discount: null },
-            { id: 3, name: "NITRO EXOTIC ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/4345877/img_id1185717723929110891.jpeg/orig", discount: null },
-            { id: 4, name: "NITRO JUICED ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=fa0f5410633da4ede3a1ad7cffad67aec32109f6-6263806-images-thumbs&n=13", discount: null },
-            { id: 5, name: "DRIVE ORGINAL 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://s.myspar.ru/upload/img/10/1003/100335271.jpg?1746607022", discount: null },
-            { id: 6, name: "DRIVE BERRY KICK 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-eda/18916937/a4d239d87b317e4df31947d3e7df50f4/orig", discount: null },
-            { id: 7, name: "GORILLA ORGINAL 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=2ce02278bf8e738efce986c38e6019a0_l-4570724-images-thumbs&n=13", discount: null },
-            { id: 8, name: "GORILLA MANGO 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/17759967/2a0000019de83631fa1afbf2fd33e9436008/orig", discount: null },
-            { id: 9, name: "GORILLA ORANGE 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://www.deloks.ru/upload/iblock/124/500f718ir65r2oxhi5in58h3utn81m0o/napitok_energeticheskiy_gorilla_orange_bezalk_toniz_zh_b_0_45lkh24sht_up_4_full.jpg", discount: null },
-            { id: 10, name: "GORILLA MELON 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://cdn.shopify.com/s/files/1/0984/9860/9446/files/Gorila_W_M_can_mockup_500ml.png?v=1763186784&width=800", discount: null },
-            { id: 11, name: "FLASH ORGINAL 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=c71d6363702510fc1cd52d11f29baa1f_l-9264723-images-thumbs&n=13", discount: null },
-            { id: 12, name: "FLASH NIGHT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://carlsberg-group-2022.euwest01.umbraco.io/media/10pgrixh/flashup_night_movie_black_21-1.png", discount: null },
-            { id: 13, name: "TORNADO MANGO 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-1-l/12317460933.jpg", discount: null },
-            { id: 14, name: "TORNADO STORM 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=ad459d6749a04a90f520b48d759673cf_l-5616093-images-thumbs&n=13", discount: null },
-            { id: 15, name: "TORNADO ICEBERRY 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-1-5/c1000/8466680813.jpg", discount: null },
-            { id: 16, name: "TORNADO SKILL 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=035027ba7701357b01c4df0d10c1fd94_l-5597167-images-thumbs&n=13", discount: null },
-            { id: 17, name: "LAVINA ORGINAL 0,45л", price: 55, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=c2c88fdc466bae542d40ab48ba0cf25edb9cd87a-5317815-images-thumbs&n=13", discount: null },
-            { id: 18, name: "LAVINA MANGO 0,45л", price: 55, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=26458eacafefba9374a827825fb0a2d719716ca3-8529854-images-thumbs&n=13", discount: null },
-            { id: 19, name: "LAVINA POWER 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://imageproxy.wolt.com/assets/6a3e483247424ff12e2c8dae", discount: null },
-            { id: 20, name: "KHABIB ENERGY 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-altay/10267222/2a00000193300c7581cc2e036063613d576c/XXXL", discount: null },
-            { id: 21, name: "ADRINALIN 0,45л", price: 130, oldPrice: null, volume: "0,45л", image: "https://marketdo4a.com/upload/iblock/414/energeticheskii_napitok_adrenaline_rush_3.jpg", discount: null },
-            { id: 22, name: "FLAVIS CURRANT 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://pimg2.supl.biz/media/proposals/images/81/f8/supl_81f81f1d-e7bd-4949-b148-c7655c454155.png", discount: null },
-            { id: 23, name: "FLAVIS RASPBERRY 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://pimg1.supl.biz/media/proposals/images/e3/ac/supl_e3ac96a7-344f-4054-8c8a-4206250e793b.png", discount: null },
-            { id: 24, name: "FLAVIS POMEGRANATE 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://cdn2.may24.ru/upload/iblock/f70/5iulvwgel6l5t73aqdf6279dp15ntp67.jpg", discount: null },
-            { id: 25, name: "FLAVIS PEAR 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://ecimg.cafe24img.com/pg177b13848986083/foodfortune/web/product/big/20260103/bae5d6e8385626d443a639fd457b0341.jpg", discount: null },
-            { id: 26, name: "MOJITO CITY BAR GRANAT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=1b0cb18cded1dd8cbf58ce82287354c5_l-4230742-images-thumbs&n=13", discount: null },
-            { id: 27, name: "MOJITO CITY BAR LIME 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=b099415b4264648d45d998972e917654_l-12652282-images-thumbs&n=13", discount: null },
-            { id: 28, name: "MOJITO CITY BAR MANGO 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=5308c422e9a389cb12622a46f10688a9_l-3888471-images-thumbs&n=13", discount: null },
-            { id: 29, name: "MOJITO CITY BAR STRAWBERRY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://images.satu.kz/232804251_w200_h200_napitok-mojito-fresh.jpg", discount: null },
-            { id: 30, name: "ZIGI ZAGI MOXITO 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://simg.marwin.kz/media/catalog/product/n/a/napitok_zigizagi_so_vkusom_mok_1.png", discount: null },
-            { id: 31, name: "ZIGI ZAGI GRANAT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://produktoff.kz/pictures/product/big/36688_big.png", discount: null },
-            { id: 32, name: "ZIGI ZAGI LEMONADE 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://imageproxy.wolt.com/assets/6a2a7c7d834e58a736c2a5df", discount: null },
-            { id: 33, name: "ZIGI ZAGI KIWI 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=8fe70c45f07ace4d0206725d4c0c1182_l-5349316-images-thumbs&n=13", discount: null },
-            { id: 34, name: "COCA COLA 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://tabac.ru/files/products/3_8.350x350.png", discount: null },
-            { id: 35, name: "SALAM COLA 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://static.ayanmarket.kz/products/images/image_2025-12-22-10-31-77_4870001573836.png", discount: null }
+            { id: 241, name: "NITRO GREEN ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/5216590/img_id362706678678697277.jpeg/orig", discount: null },
+            { id: 242, name: "NITRO EXTREME ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-v/6271696279.jpg", discount: null },
+            { id: 243, name: "NITRO EXOTIC ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/4345877/img_id1185717723929110891.jpeg/orig", discount: null },
+            { id: 244, name: "NITRO JUICED ENERGY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=fa0f5410633da4ede3a1ad7cffad67aec32109f6-6263806-images-thumbs&n=13", discount: null },
+            { id: 245, name: "DRIVE ORGINAL 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://s.myspar.ru/upload/img/10/1003/100335271.jpg?1746607022", discount: null },
+            { id: 246, name: "DRIVE BERRY KICK 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-eda/18916937/a4d239d87b317e4df31947d3e7df50f4/orig", discount: null },
+            { id: 247, name: "GORILLA ORGINAL 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=2ce02278bf8e738efce986c38e6019a0_l-4570724-images-thumbs&n=13", discount: null },
+            { id: 248, name: "GORILLA MANGO 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-mpic/17759967/2a0000019de83631fa1afbf2fd33e9436008/orig", discount: null },
+            { id: 249, name: "GORILLA ORANGE 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://www.deloks.ru/upload/iblock/124/500f718ir65r2oxhi5in58h3utn81m0o/napitok_energeticheskiy_gorilla_orange_bezalk_toniz_zh_b_0_45lkh24sht_up_4_full.jpg", discount: null },
+            { id: 250, name: "GORILLA MELON 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://cdn.shopify.com/s/files/1/0984/9860/9446/files/Gorila_W_M_can_mockup_500ml.png?v=1763186784&width=800", discount: null },
+            { id: 251, name: "FLASH ORGINAL 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=c71d6363702510fc1cd52d11f29baa1f_l-9264723-images-thumbs&n=13", discount: null },
+            { id: 252, name: "FLASH NIGHT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://carlsberg-group-2022.euwest01.umbraco.io/media/10pgrixh/flashup_night_movie_black_21-1.png", discount: null },
+            { id: 253, name: "TORNADO MANGO 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-1-l/12317460933.jpg", discount: null },
+            { id: 254, name: "TORNADO STORM 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=ad459d6749a04a90f520b48d759673cf_l-5616093-images-thumbs&n=13", discount: null },
+            { id: 255, name: "TORNADO ICEBERRY 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://ir.ozone.ru/s3/multimedia-1-5/c1000/8466680813.jpg", discount: null },
+            { id: 256, name: "TORNADO SKILL 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=035027ba7701357b01c4df0d10c1fd94_l-5597167-images-thumbs&n=13", discount: null },
+            { id: 257, name: "LAVINA ORGINAL 0,45л", price: 55, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=c2c88fdc466bae542d40ab48ba0cf25edb9cd87a-5317815-images-thumbs&n=13", discount: null },
+            { id: 258, name: "LAVINA MANGO 0,45л", price: 55, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=26458eacafefba9374a827825fb0a2d719716ca3-8529854-images-thumbs&n=13", discount: null },
+            { id: 259, name: "LAVINA POWER 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://imageproxy.wolt.com/assets/6a3e483247424ff12e2c8dae", discount: null },
+            { id: 260, name: "KHABIB ENERGY 0,45л", price: 80, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/get-altay/10267222/2a00000193300c7581cc2e036063613d576c/XXXL", discount: null },
+            { id: 261, name: "ADRINALIN 0,45л", price: 130, oldPrice: null, volume: "0,45л", image: "https://marketdo4a.com/upload/iblock/414/energeticheskii_napitok_adrenaline_rush_3.jpg", discount: null },
+            { id: 262, name: "FLAVIS CURRANT 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://pimg2.supl.biz/media/proposals/images/81/f8/supl_81f81f1d-e7bd-4949-b148-c7655c454155.png", discount: null },
+            { id: 263, name: "FLAVIS RASPBERRY 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://pimg1.supl.biz/media/proposals/images/e3/ac/supl_e3ac96a7-344f-4054-8c8a-4206250e793b.png", discount: null },
+            { id: 264, name: "FLAVIS POMEGRANATE 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://cdn2.may24.ru/upload/iblock/f70/5iulvwgel6l5t73aqdf6279dp15ntp67.jpg", discount: null },
+            { id: 265, name: "FLAVIS PEAR 0,45л", price: 75, oldPrice: null, volume: "0,45л", image: "https://ecimg.cafe24img.com/pg177b13848986083/foodfortune/web/product/big/20260103/bae5d6e8385626d443a639fd457b0341.jpg", discount: null },
+            { id: 266, name: "MOJITO CITY BAR GRANAT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=1b0cb18cded1dd8cbf58ce82287354c5_l-4230742-images-thumbs&n=13", discount: null },
+            { id: 267, name: "MOJITO CITY BAR LIME 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=b099415b4264648d45d998972e917654_l-12652282-images-thumbs&n=13", discount: null },
+            { id: 268, name: "MOJITO CITY BAR MANGO 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=5308c422e9a389cb12622a46f10688a9_l-3888471-images-thumbs&n=13", discount: null },
+            { id: 269, name: "MOJITO CITY BAR STRAWBERRY 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://images.satu.kz/232804251_w200_h200_napitok-mojito-fresh.jpg", discount: null },
+            { id: 270, name: "ZIGI ZAGI MOXITO 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://simg.marwin.kz/media/catalog/product/n/a/napitok_zigizagi_so_vkusom_mok_1.png", discount: null },
+            { id: 271, name: "ZIGI ZAGI GRANAT 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://produktoff.kz/pictures/product/big/36688_big.png", discount: null },
+            { id: 272, name: "ZIGI ZAGI LEMONADE 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://imageproxy.wolt.com/assets/6a2a7c7d834e58a736c2a5df", discount: null },
+            { id: 273, name: "ZIGI ZAGI KIWI 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://avatars.mds.yandex.net/i?id=8fe70c45f07ace4d0206725d4c0c1182_l-5349316-images-thumbs&n=13", discount: null },
+            { id: 274, name: "COCA COLA 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://tabac.ru/files/products/3_8.350x350.png", discount: null },
+            { id: 275, name: "SALAM COLA 0,45л", price: 70, oldPrice: null, volume: "0,45л", image: "https://static.ayanmarket.kz/products/images/image_2025-12-22-10-31-77_4870001573836.png", discount: null }
         ];
 
         window.onload = function() {
@@ -136,7 +136,7 @@
         };
 
         function saveCartToStorage() {
-            localStorage.setItem('banos_cart', JSON.stringify(cart));
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
         }
 
         // Вход в админку по 5 кликам по заголовку
