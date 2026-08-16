@@ -93,19 +93,19 @@
 
         // Базовые товары для раздела «Консервы»
         let konservyProducts = JSON.parse(localStorage.getItem('yasyn_konservy_products')) || [
-            { id: 1, name: "АНАНАС 830г", price: 220, oldPrice: null, volume: "830г", image: "https://www.витамин.com/wp-content/uploads/2021/07/anan-kolczami-1.jpg", discount: null },
-            { id: 2, name: "АНАНАС 330г", price: 160, oldPrice: null, volume: "330г", image: "https://www.витамин.com/wp-content/uploads/2021/07/anan-kolczami-1.jpg", discount: null },
-            { id: 3, name: "KING КУКУРУЗА 440г", price: 60, oldPrice: null, volume: "440г", image: "https://bpc.kz/wp-content/uploads/2019/08/1-1-02-02-51-01-0340.jpg", discount: null },
-            { id: 4, name: "ГОРОШЕК 400г", price: 60, oldPrice: null, volume: "400г", image: "https://vkusdostavka.ru/upload/iblock/295/pfc7zkfzcrmyky27lrthknw04ifmpiio.jpg", discount: null },
-            { id: 5, name: "KING НОКАТ 440г", price: 220, oldPrice: null, volume: "440г", image: "https://images.satu.kz/232756773_w500_h500_king-konservirovannyj-nut.jpg", discount: null },
-            { id: 6, name: "САЙРА 240г", price: 180, oldPrice: null, volume: "240г", image: "https://www.auchan.ru/storage/compressed/r76mDceUcXohrodGOxak6nD4pxepvlEz2aAO5iUw.jpg", discount: null },
-            { id: 7, name: "ГОВЯДИНА ТУШЕННАЯ 300г", price: 200, oldPrice: null, volume: "300г", image: "https://abroi.kg/uploads/media/product_photo/0001/01/thumb_309_product_photo_big.png", discount: null },
-            { id: 8, name: "КУБЛЕЙ 325г", price: 350, oldPrice: null, volume: "325г", image: "https://ir.ozone.ru/s3/multimedia-d/6460623685.jpg", discount: null },
-            { id: 9, name: "СЕЛЬДЬ 325г", price: 160, oldPrice: null, volume: "325г", image: "https://avatars.mds.yandex.net/i?id=d2300ae94512ddabf25bac95b15ab099_l-10354607-images-thumbs&n=13", discount: null },
-            { id: 10, name: "СКУМБРИЯ 240г", price: 250, oldPrice: null, volume: "240г", image: "https://avatars.mds.yandex.net/i?id=e37148b2c7fc4145f199a1e0f0a7672b_l-9198382-images-thumbs&n=13", discount: null },
-            { id: 11, name: "КИЛЬКА КАСПИЙСКАЯ В ТОМАТНОМ СОУСЕ 240г", price: 130, oldPrice: null, volume: "240г", image: "https://ir.ozone.ru/s3/multimedia-1-2/9538649174.jpg", discount: null },
-            { id: 12, name: "КИЛЬКА КАЛИНИНГРАД В ТОМАТНОМ СОУСЕ 240г", price: 120, oldPrice: null, volume: "240г", image: "https://static.onlinetrade.ru/img/items/b/sokhranim_traditsii_s_ovoshchami_v_tomatnom_souse_po_kaliningradski_240_g_3827424_1.jpg", discount: null },
-            { id: 13, name: "КИЛЬКА БАЛТИЙСКАЯ В ТОМАТНОМ СОУСЕ 240г", price: 130, oldPrice: null, volume: "240г", image: "https://avatars.mds.yandex.net/i?id=189593d840ca8edf729f9317f30c1f3fda4f4532-4465311-images-thumbs&n=13", discount: null }
+            { id: 161, name: "АНАНАС 830г", price: 220, oldPrice: null, volume: "830г", image: "https://www.витамин.com/wp-content/uploads/2021/07/anan-kolczami-1.jpg", discount: null },
+            { id: 162, name: "АНАНАС 330г", price: 160, oldPrice: null, volume: "330г", image: "https://www.витамин.com/wp-content/uploads/2021/07/anan-kolczami-1.jpg", discount: null },
+            { id: 163, name: "KING КУКУРУЗА 440г", price: 60, oldPrice: null, volume: "440г", image: "https://bpc.kz/wp-content/uploads/2019/08/1-1-02-02-51-01-0340.jpg", discount: null },
+            { id: 164, name: "ГОРОШЕК 400г", price: 60, oldPrice: null, volume: "400г", image: "https://vkusdostavka.ru/upload/iblock/295/pfc7zkfzcrmyky27lrthknw04ifmpiio.jpg", discount: null },
+            { id: 165, name: "KING НОКАТ 440г", price: 220, oldPrice: null, volume: "440г", image: "https://images.satu.kz/232756773_w500_h500_king-konservirovannyj-nut.jpg", discount: null },
+            { id: 166, name: "САЙРА 240г", price: 180, oldPrice: null, volume: "240г", image: "https://www.auchan.ru/storage/compressed/r76mDceUcXohrodGOxak6nD4pxepvlEz2aAO5iUw.jpg", discount: null },
+            { id: 167, name: "ГОВЯДИНА ТУШЕННАЯ 300г", price: 200, oldPrice: null, volume: "300г", image: "https://abroi.kg/uploads/media/product_photo/0001/01/thumb_309_product_photo_big.png", discount: null },
+            { id: 168, name: "КУБЛЕЙ 325г", price: 350, oldPrice: null, volume: "325г", image: "https://ir.ozone.ru/s3/multimedia-d/6460623685.jpg", discount: null },
+            { id: 169, name: "СЕЛЬДЬ 325г", price: 160, oldPrice: null, volume: "325г", image: "https://avatars.mds.yandex.net/i?id=d2300ae94512ddabf25bac95b15ab099_l-10354607-images-thumbs&n=13", discount: null },
+            { id: 170, name: "СКУМБРИЯ 240г", price: 250, oldPrice: null, volume: "240г", image: "https://avatars.mds.yandex.net/i?id=e37148b2c7fc4145f199a1e0f0a7672b_l-9198382-images-thumbs&n=13", discount: null },
+            { id: 171, name: "КИЛЬКА КАСПИЙСКАЯ В ТОМАТНОМ СОУСЕ 240г", price: 130, oldPrice: null, volume: "240г", image: "https://ir.ozone.ru/s3/multimedia-1-2/9538649174.jpg", discount: null },
+            { id: 172, name: "КИЛЬКА КАЛИНИНГРАД В ТОМАТНОМ СОУСЕ 240г", price: 120, oldPrice: null, volume: "240г", image: "https://static.onlinetrade.ru/img/items/b/sokhranim_traditsii_s_ovoshchami_v_tomatnom_souse_po_kaliningradski_240_g_3827424_1.jpg", discount: null },
+            { id: 173, name: "КИЛЬКА БАЛТИЙСКАЯ В ТОМАТНОМ СОУСЕ 240г", price: 130, oldPrice: null, volume: "240г", image: "https://avatars.mds.yandex.net/i?id=189593d840ca8edf729f9317f30c1f3fda4f4532-4465311-images-thumbs&n=13", discount: null }
         ];
 
         window.onload = function() {
@@ -114,7 +114,7 @@
         };
 
         function saveCartToStorage() {
-            localStorage.setItem('konserva_cart', JSON.stringify(cart));
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
         }
 
         // Вход в админку по 5 кликам по заголовку страницы
