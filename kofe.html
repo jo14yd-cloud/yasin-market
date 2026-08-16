@@ -93,22 +93,22 @@
 
         // Базовые товары для раздела «Кофе»
         let coffeeProducts = JSON.parse(localStorage.getItem('yasyn_coffee_products')) || [
-            { id: 1, name: "JOKEY FAVORITE 95g", price: 220, oldPrice: null, volume: "95g", image: "https://avatars.mds.yandex.net/get-mpic/11417897/2a0000018ef84208f5ad0da6f3666a04731c/orig", discount: null },
-            { id: 2, name: "JOKEY IMPER 95g", price: 270, oldPrice: null, volume: "95g", image: "https://avatars.mds.yandex.net/get-mpic/11240005/2a0000019211211170c6d70059ae5ee3fa6d/9hq", discount: null },
-            { id: 3, name: "JOKEY TRIUMPH 95g", price: 270, oldPrice: null, volume: "95g", image: "https://avatars.mds.yandex.net/i?id=52b058435f96db7f903db91ae3797d7a_l-5236798-images-thumbs&n=13", discount: null },
-            { id: 4, name: "NESKAFE GOLD 95g", price: 330, oldPrice: null, volume: "95g", image: "https://main-cdn.sbermegamarket.ru/big1/hlr-system/-5/69/01/29/05/81/9/100027063563b0.jpg", discount: null },
-            { id: 5, name: "NESKAFE GOLD 47,5g", price: 230, oldPrice: null, volume: "47,5g", image: "https://main-cdn.sbermegamarket.ru/big1/hlr-system/-5/69/01/29/05/81/9/100027063563b0.jpg", discount: null },
-            { id: 6, name: "BLACK IN BLACK 85g", price: 300, oldPrice: null, volume: "85g", image: "https://gosudarnn.ru/upload/iblock/f35/uzdfd5pf9o2lbe3tn05tzdlt4gz4wntw.jpg", discount: null },
-            { id: 7, name: "MACCOFFEE DI TORINO 20шт", price: 380, oldPrice: null, volume: "20шт", image: "https://avatars.mds.yandex.net/get-mpic/11535894/2a0000018c4df7b3f7da79b50f3ce5ea69c2/orig", discount: null },
-            { id: 8, name: "MACCOFFEE THE ORGINAL 20шт", price: 110, oldPrice: null, volume: "20шт", image: "https://naturcoffee.ru/image/cache/catalog/tovary/0/wa-data-public-shop-products-00-92-9200-images-6897-6897-970-1000x1000.jpg", discount: null },
-            { id: 9, name: "TORA BIKA 20шт", price: 380, oldPrice: null, volume: "20шт", image: "https://avatars.mds.yandex.net/get-mpic/5320264/2a000001917c729d25f01cc5f288a321a703/orig", discount: null },
-            { id: 10, name: "BETA CAFFITTO 25шт", price: 250, oldPrice: null, volume: "25шт", image: "https://minio.clevermart.kz/food/images/2024/3/19/bf440f9d-b210-4467-9b84-7007a72af822/M_4870204140064_1.jpg", discount: null },
-            { id: 11, name: "MACCOFFEE AMERICAN CREAM 20шт", price: 450, oldPrice: null, volume: "20шт", image: "https://avatars.mds.yandex.net/i?id=646749875a2411c8bb5f36957d582fa29912db79-10907882-images-thumbs&n=13", discount: null },
-            { id: 12, name: "MACCOFFEE AMERICAN CREAM 1шт", price: 25, oldPrice: null, volume: "1шт", image: "https://semeiniy.kz/wa-data/public/shop/products/61/92/119261/images/37804/37804.970.jpg", discount: null },
-            { id: 13, name: "MACCOFFEE DI TORINO 1шт", price: 25, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/get-mpic/11535894/2a0000018c4df7b3f7da79b50f3ce5ea69c2/orig", discount: null },
-            { id: 14, name: "MACCOFFEE THE ORGINAL 1шт", price: 10, oldPrice: null, volume: "1шт", image: "https://naturcoffee.ru/image/cache/catalog/tovary/0/wa-data-public-shop-products-00-92-9200-images-6897-6897-970-1000x1000.jpg", discount: null },
-            { id: 15, name: "BRIDGE COFFE 1шт", price: 15, oldPrice: null, volume: "1шт", image: "https://api.kdvonline.ru/thumbnail/740x740/50/189/50189.png", discount: null },
-            { id: 16, name: "BRIDGE COFFE LATTE 1шт", price: 15, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/get-mpic/14832725/2a0000019888683d8d3591f437e43b0a14fb/orig", discount: null }
+             { id: 42, name: "JOKEY FAVORITE 95g", price: 220, oldPrice: null, volume: "95g", image: "https://avatars.mds.yandex.net/get-mpic/11417897/2a0000018ef84208f5ad0da6f3666a04731c/orig", discount: null },
+            { id: 43, name: "JOKEY IMPER 95g", price: 270, oldPrice: null, volume: "95g", image: "https://avatars.mds.yandex.net/get-mpic/11240005/2a0000019211211170c6d70059ae5ee3fa6d/9hq", discount: null },
+            { id: 44, name: "JOKEY TRIUMPH 95g", price: 270, oldPrice: null, volume: "95g", image: "https://avatars.mds.yandex.net/i?id=52b058435f96db7f903db91ae3797d7a_l-5236798-images-thumbs&n=13", discount: null },
+            { id: 45, name: "NESKAFE GOLD 95g", price: 330, oldPrice: null, volume: "95g", image: "https://main-cdn.sbermegamarket.ru/big1/hlr-system/-5/69/01/29/05/81/9/100027063563b0.jpg", discount: null },
+            { id: 46, name: "NESKAFE GOLD 47,5g", price: 230, oldPrice: null, volume: "47,5g", image: "https://main-cdn.sbermegamarket.ru/big1/hlr-system/-5/69/01/29/05/81/9/100027063563b0.jpg", discount: null },
+            { id: 47, name: "BLACK IN BLACK 85g", price: 300, oldPrice: null, volume: "85g", image: "https://gosudarnn.ru/upload/iblock/f35/uzdfd5pf9o2lbe3tn05tzdlt4gz4wntw.jpg", discount: null },
+            { id: 48, name: "MACCOFFEE DI TORINO 20шт", price: 380, oldPrice: null, volume: "20шт", image: "https://avatars.mds.yandex.net/get-mpic/11535894/2a0000018c4df7b3f7da79b50f3ce5ea69c2/orig", discount: null },
+            { id: 49, name: "MACCOFFEE THE ORGINAL 20шт", price: 110, oldPrice: null, volume: "20шт", image: "https://naturcoffee.ru/image/cache/catalog/tovary/0/wa-data-public-shop-products-00-92-9200-images-6897-6897-970-1000x1000.jpg", discount: null },
+            { id: 50, name: "TORA BIKA 20шт", price: 380, oldPrice: null, volume: "20шт", image: "https://avatars.mds.yandex.net/get-mpic/5320264/2a000001917c729d25f01cc5f288a321a703/orig", discount: null },
+            { id: 51, name: "BETA CAFFITTO 25шт", price: 250, oldPrice: null, volume: "25шт", image: "https://minio.clevermart.kz/food/images/2024/3/19/bf440f9d-b210-4467-9b84-7007a72af822/M_4870204140064_1.jpg", discount: null },
+            { id: 52, name: "MACCOFFEE AMERICAN CREAM 20шт", price: 450, oldPrice: null, volume: "20шт", image: "https://avatars.mds.yandex.net/i?id=646749875a2411c8bb5f36957d582fa29912db79-10907882-images-thumbs&n=13", discount: null },
+            { id: 53, name: "MACCOFFEE AMERICAN CREAM 1шт", price: 25, oldPrice: null, volume: "1шт", image: "https://semeiniy.kz/wa-data/public/shop/products/61/92/119261/images/37804/37804.970.jpg", discount: null },
+            { id: 54, name: "MACCOFFEE DI TORINO 1шт", price: 25, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/get-mpic/11535894/2a0000018c4df7b3f7da79b50f3ce5ea69c2/orig", discount: null },
+            { id: 55, name: "MACCOFFEE THE ORGINAL 1шт", price: 10, oldPrice: null, volume: "1шт", image: "https://naturcoffee.ru/image/cache/catalog/tovary/0/wa-data-public-shop-products-00-92-9200-images-6897-6897-970-1000x1000.jpg", discount: null },
+            { id: 56, name: "BRIDGE COFFE 1шт", price: 15, oldPrice: null, volume: "1шт", image: "https://api.kdvonline.ru/thumbnail/740x740/50/189/50189.png", discount: null },
+            { id: 57, name: "BRIDGE COFFE LATTE 1шт", price: 15, oldPrice: null, volume: "1шт", image: "https://avatars.mds.yandex.net/get-mpic/14832725/2a0000019888683d8d3591f437e43b0a14fb/orig", discount: null }
         ];
 
         window.onload = function() {
