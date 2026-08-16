@@ -93,11 +93,11 @@
 
         // Базовые товары для раздела «Мука»
         let flourProducts = JSON.parse(localStorage.getItem('yasyn_flour_products')) || [
-            { id: 1, name: "НАРОДНЫЙ 1 СОРТ 50кг", price: 1850, oldPrice: null, volume: "50кг", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc5CbnV1OF7tiYqitfg4rO2y1hHEagvHSmYQ&s", discount: null },
-            { id: 2, name: "АЛТЫН ТАЖЫ 1 СОРТ 50кг", price: 1900, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
-            { id: 3, name: "АЗИЯ 1 СОРТ 50кг", price: 2000, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
-            { id: 4, name: "ГУЗЕЛЬ 1 СОРТ 50кг", price: 1750, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
-            { id: 5, name: "ТУЛПАР 2 СОРТ 50кг", price: 1350, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
+            { id: 126, name: "НАРОДНЫЙ 1 СОРТ 50кг", price: 1850, oldPrice: null, volume: "50кг", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc5CbnV1OF7tiYqitfg4rO2y1hHEagvHSmYQ&s", discount: null },
+            { id: 127, name: "АЛТЫН ТАЖЫ 1 СОРТ 50кг", price: 1900, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
+            { id: 128, name: "АЗИЯ 1 СОРТ 50кг", price: 2000, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
+            { id: 129, name: "ГУЗЕЛЬ 1 СОРТ 50кг", price: 1750, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
+            { id: 130, name: "ТУЛПАР 2 СОРТ 50кг", price: 1350, oldPrice: null, volume: "50кг", image: "https://avatars.mds.yandex.net/i?id=a796cf284e3a43aa0992c06f870944e4_l-12434061-images-thumbs&n=13", discount: null },
             
         ];
 
@@ -107,7 +107,7 @@
         };
 
         function saveCartToStorage() {
-            localStorage.setItem('muka_cart', JSON.stringify(cart));
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
         }
 
         // Вход в админку по 5 кликам по названию «Мука 🌾»
