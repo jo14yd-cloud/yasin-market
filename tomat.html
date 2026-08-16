@@ -93,13 +93,13 @@
 
         // Базовые товары для раздела «Томатная паста»
         let tomatProducts = JSON.parse(localStorage.getItem('yasyn_tomat_products')) || [
-            { id: 1, name: "АЙЛАНА ТОМАТ 900г", price: 190, oldPrice: null, volume: "900г", image: "https://datkaprod.ru/thumb/2/IPAihfqq8Q2MVXdPkvKTjA/r/d/cml2_998384585_4206591100.jpg", discount: null },
-            { id: 2, name: "АЙЛАНА ТОМАТ 500г", price: 120, oldPrice: null, volume: "500г", image: "https://datkaprod.ru/thumb/2/IPAihfqq8Q2MVXdPkvKTjA/r/d/cml2_998384585_4206591100.jpg", discount: null },
-            { id: 3, name: "АЙЛАНА ТОМАТ 250г", price: 80, oldPrice: null, volume: "250г", image: "https://datkaprod.ru/thumb/2/IPAihfqq8Q2MVXdPkvKTjA/r/d/cml2_998384585_4206591100.jpg", discount: null },
-            { id: 4, name: "ПЕРЕВОСХОД 900г", price: 100, oldPrice: null, volume: "900г", image: "https://abcfood.net/wp-content/uploads/2024/11/pasta-tomatnaya-abc-2025-1000g.jpg", discount: null },
-            { id: 5, name: "САРЫ ОЗОН 900г", price: 140, oldPrice: null, volume: "900г", image: "https://avatars.mds.yandex.net/i?id=e4b1001e077d3500dbb4721a7c96dd33_l-3831986-images-thumbs&n=13", discount: null },
-            { id: 6, name: "САРЫ ОЗОН 500г", price: 100, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/i?id=e4b1001e077d3500dbb4721a7c96dd33_l-3831986-images-thumbs&n=13", discount: null },
-            { id: 7, name: "3 ЖЕЛАНИЕ ТОМАТ 500г", price: 120, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/i?id=ff85b0e1a303a1680dd05da3fae65019_l-5847755-images-thumbs&n=13", discount: null }
+            { id: 154, name: "АЙЛАНА ТОМАТ 900г", price: 190, oldPrice: null, volume: "900г", image: "https://datkaprod.ru/thumb/2/IPAihfqq8Q2MVXdPkvKTjA/r/d/cml2_998384585_4206591100.jpg", discount: null },
+            { id: 155, name: "АЙЛАНА ТОМАТ 500г", price: 120, oldPrice: null, volume: "500г", image: "https://datkaprod.ru/thumb/2/IPAihfqq8Q2MVXdPkvKTjA/r/d/cml2_998384585_4206591100.jpg", discount: null },
+            { id: 156, name: "АЙЛАНА ТОМАТ 250г", price: 80, oldPrice: null, volume: "250г", image: "https://datkaprod.ru/thumb/2/IPAihfqq8Q2MVXdPkvKTjA/r/d/cml2_998384585_4206591100.jpg", discount: null },
+            { id: 157, name: "ПЕРЕВОСХОД 900г", price: 100, oldPrice: null, volume: "900г", image: "https://abcfood.net/wp-content/uploads/2024/11/pasta-tomatnaya-abc-2025-1000g.jpg", discount: null },
+            { id: 158, name: "САРЫ ОЗОН 900г", price: 140, oldPrice: null, volume: "900г", image: "https://avatars.mds.yandex.net/i?id=e4b1001e077d3500dbb4721a7c96dd33_l-3831986-images-thumbs&n=13", discount: null },
+            { id: 159, name: "САРЫ ОЗОН 500г", price: 100, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/i?id=e4b1001e077d3500dbb4721a7c96dd33_l-3831986-images-thumbs&n=13", discount: null },
+            { id: 160, name: "3 ЖЕЛАНИЕ ТОМАТ 500г", price: 120, oldPrice: null, volume: "500г", image: "https://avatars.mds.yandex.net/i?id=ff85b0e1a303a1680dd05da3fae65019_l-5847755-images-thumbs&n=13", discount: null }
         ];
 
         window.onload = function() {
@@ -108,7 +108,7 @@
         };
 
         function saveCartToStorage() {
-            localStorage.setItem('tomat_cart', JSON.stringify(cart));
+            localStorage.setItem('asia_cart', JSON.stringify(cart));
         }
 
         // Вход в админку по 5 кликам по заголовку страницы
