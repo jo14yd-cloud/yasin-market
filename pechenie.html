@@ -93,27 +93,27 @@
 
         // Базовые товары для раздела «Печенье и сладости»
         let pecheneProducts = JSON.parse(localStorage.getItem('yasyn_pechene_products')) || [
-            { id: 174, name: "БАРБОЛ ШОКО СЕНДВИЧ 1кг", price: 320, oldPrice: null, volume: "1кг", image: "https://www.deloks.ru/upload/iblock/6d6/1zhdi93rev5awot5qul3rvr19yw9y3se/pechene_oreo_oreo_shokoladnoe_nachinka_iz_vanilnogo_krema_228_g_6_sht_kh_38_g_korobka_5_full.jpg", discount: null },
-            { id: 175, name: "БАРБОЛ СЕНДВИЧ ДЕНЬ И НОЧЬ 1кг", price: 320, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=b14ebecf46b9c102d061469f573b851f_l-8173407-images-thumbs&n=13", discount: null },
-            { id: 176, name: "БАРБОЛ СЕРДЕЧКА 1кг", price: 250, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=17ec1e431a18016d2a638dc8d37f6aee_l-4874404-images-thumbs&n=13", discount: null },
-            { id: 177, name: "БАРБОЛ ПУДРА 1кг", price: 280, oldPrice: null, volume: "1кг", image: "https://thumbs.dreamstime.com/b/ddelicious-jam-cookies-macro-shot-delicious-36490589.jpg", discount: null },
-            { id: 178, name: "БАРБОЛ ЗЫГАРДУ 1кг", price: 260, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=4e22081499298a4830922de5017abfd4_l-5696766-images-thumbs&n=13", discount: null },
-            { id: 179, name: "БАРБОЛ ОВСЯННАЯ 1кг", price: 270, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=b32e56e6274bf7ba775cf59be6a355c1_l-5877254-images-thumbs&ref=rim&n=13&w=800&h=800", discount: null },
-            { id: 180, name: "БАРБОЛ КОФЕ 1кг", price: 200, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/get-mpic/5257660/img_id3881560125739038472.jpeg/orig", discount: null },
-            { id: 181, name: "ZARQAND MELLA 1кг", price: 300, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=60fe33067c023c99ac47a427a16c9502_sr-4239171-images-thumbs&n=13", discount: null },
-            { id: 182, name: "ZARQAND КУНЖУТ 1кг", price: 350, oldPrice: null, volume: "1кг", image: "https://zarqand.uz/wp-content/uploads/2026/04/2000-scaled.jpg", discount: null },
-            { id: 183, name: "ZARQAND ШОКО КУНЖУТ 1кг", price: 320, oldPrice: null, volume: "1кг", image: "https://zarqand.uz/wp-content/uploads/2026/04/3311-scaled.jpg", discount: null },
-            { id: 184, name: "SFAD ТВОРОЖНОЕ 1кг", price: 200, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=e724433df6fe69895451af579b7ede65_l-6372940-images-thumbs&n=13", discount: null },
-            { id: 185, name: "ТОПЛЕННОЕ МОЛОКО 1кг", price: 250, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=5722e1cd788cd2760ee7fd7cb9a04fc0_l-16405973-images-thumbs&n=13", discount: null },
-            { id: 186, name: "YASHAR ВАФЛИ 1кг", price: 250, oldPrice: null, volume: "1кг", image: "https://www.yashar.kg/files/resized/products/1337-vafli-3kg.1200x1200w.png", discount: null },
-            { id: 187, name: "SFAD FLAMINGO 1кг", price: 230, oldPrice: null, volume: "1кг", image: "https://permkonditer.ru/upload/iblock/30f/8y2r37fc95th2ew02wv3b37g22f2cl6m.jpg", discount: null },
-            { id: 188, name: "SFAD AVALON 1кг", price: 230, oldPrice: null, volume: "1кг", image: "https://tkyarmarka.com/upload/resize_cache/iblock/004/220_200_1/y2lrneihku86g4ojhfmsss7g9dzfb5h8.jpeg", discount: null },
-            { id: 189, name: "ATA СЕНДВИЧ 1кг", price: 200, oldPrice: null, volume: "1кг", image: "https://buy.am/media/image/62/d8/93/yerevan-city-1039884.jpg", discount: null },
-            { id: 190, name: "ATA ЗООПАРК 1кг", price: 180, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=af27ba2e063f9a91a2bca36f608611cb-4600332-images-thumbs&n=13", discount: null },
-            { id: 191, name: "ВАФЛИ ПАРИЖАНКА 1кг", price: 480, oldPrice: null, volume: "1кг", image: "https://3259404.ru/upload/iblock/0d9/e2iuio9qu69bl5x5pvh3ij0a8pa00nvh.webp", discount: null },
-            { id: 192, name: "БАМБУК ПЕЧЕНЬЕ 1кг", price: 330, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=4fb02fe70fb28f8d84c880651d9a502d_l-3911323-images-thumbs&n=13", discount: null },
-            { id: 193, name: "БАМБУК ШОКО ПЕЧЕНЬЕ 1кг", price: 330, oldPrice: null, volume: "1кг", image: "https://ir.ozone.ru/s3/multimedia-1-t/7464973817.jpg", discount: null },
-            { id: 194, name: "SFAD ПОДУШКА 1кг", price: 240, oldPrice: null, volume: "1кг", image: "https://kupivsp.ru/sp/photos/b/64/641737cdb38c351e1c3d08b8396.jpg", discount: null }
+            { id: 174, name: "БАРБОЛ ШОКО СЕНДВИЧ", price: 160, oldPrice: null, volume: "0,5кг", image: "https://www.deloks.ru/upload/iblock/6d6/1zhdi93rev5awot5qul3rvr19yw9y3se/pechene_oreo_oreo_shokoladnoe_nachinka_iz_vanilnogo_krema_228_g_6_sht_kh_38_g_korobka_5_full.jpg", discount: null },
+            { id: 175, name: "БАРБОЛ СЕНДВИЧ ДЕНЬ И НОЧЬ", price: 160, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=b14ebecf46b9c102d061469f573b851f_l-8173407-images-thumbs&n=13", discount: null },
+            { id: 176, name: "БАРБОЛ СЕРДЕЧКА", price: 125, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=17ec1e431a18016d2a638dc8d37f6aee_l-4874404-images-thumbs&n=13", discount: null },
+            { id: 177, name: "БАРБОЛ ПУДРА", price: 140, oldPrice: null, volume: "0,5кг", image: "https://thumbs.dreamstime.com/b/ddelicious-jam-cookies-macro-shot-delicious-36490589.jpg", discount: null },
+            { id: 178, name: "БАРБОЛ ЗЫГАРДУ", price: 130, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=4e22081499298a4830922de5017abfd4_l-5696766-images-thumbs&n=13", discount: null },
+            { id: 179, name: "БАРБОЛ ОВСЯННАЯ", price: 135, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=b32e56e6274bf7ba775cf59be6a355c1_l-5877254-images-thumbs&ref=rim&n=13&w=800&h=800", discount: null },
+            { id: 180, name: "БАРБОЛ КОФЕ", price: 100, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/get-mpic/5257660/img_id3881560125739038472.jpeg/orig", discount: null },
+            { id: 181, name: "ZARQAND MELLA", price: 150, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=60fe33067c023c99ac47a427a16c9502_sr-4239171-images-thumbs&n=13", discount: null },
+            { id: 182, name: "ZARQAND КУНЖУТ", price: 175, oldPrice: null, volume: "0,5кг", image: "https://zarqand.uz/wp-content/uploads/2026/04/2000-scaled.jpg", discount: null },
+            { id: 183, name: "ZARQAND ШОКО КУНЖУТ", price: 160, oldPrice: null, volume: "0,5кг", image: "https://zarqand.uz/wp-content/uploads/2026/04/3311-scaled.jpg", discount: null },
+            { id: 184, name: "SFAD ТВОРОЖНОЕ", price: 100, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=e724433df6fe69895451af579b7ede65_l-6372940-images-thumbs&n=13", discount: null },
+            { id: 185, name: "ТОПЛЕННОЕ МОЛОКО", price: 125, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=5722e1cd788cd2760ee7fd7cb9a04fc0_l-16405973-images-thumbs&n=13", discount: null },
+            { id: 186, name: "YASHAR ВАФЛИ", price: 125, oldPrice: null, volume: "0,5кг", image: "https://www.yashar.kg/files/resized/products/1337-vafli-3kg.1200x1200w.png", discount: null },
+            { id: 187, name: "SFAD FLAMINGO", price: 115, oldPrice: null, volume: "0,5кг", image: "https://permkonditer.ru/upload/iblock/30f/8y2r37fc95th2ew02wv3b37g22f2cl6m.jpg", discount: null },
+            { id: 188, name: "SFAD AVALON", price: 115, oldPrice: null, volume: "0,5кг", image: "https://tkyarmarka.com/upload/resize_cache/iblock/004/220_200_1/y2lrneihku86g4ojhfmsss7g9dzfb5h8.jpeg", discount: null },
+            { id: 189, name: "ATA СЕНДВИЧ", price: 100, oldPrice: null, volume: "0,5кг", image: "https://buy.am/media/image/62/d8/93/yerevan-city-1039884.jpg", discount: null },
+            { id: 190, name: "ATA ЗООПАРК", price: 90, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=af27ba2e063f9a91a2bca36f608611cb-4600332-images-thumbs&n=13", discount: null },
+            { id: 191, name: "ВАФЛИ ПАРИЖАНКА", price: 240, oldPrice: null, volume: "0,5кг", image: "https://3259404.ru/upload/iblock/0d9/e2iuio9qu69bl5x5pvh3ij0a8pa00nvh.webp", discount: null },
+            { id: 192, name: "БАМБУК ПЕЧЕНЬЕ", price: 165, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=4fb02fe70fb28f8d84c880651d9a502d_l-3911323-images-thumbs&n=13", discount: null },
+            { id: 193, name: "БАМБУК ШОКО ПЕЧЕНЬЕ", price: 165, oldPrice: null, volume: "0,5кг", image: "https://ir.ozone.ru/s3/multimedia-1-t/7464973817.jpg", discount: null },
+            { id: 194, name: "SFAD ПОДУШКА", price: 120, oldPrice: null, volume: "0,5кг", image: "https://kupivsp.ru/sp/photos/b/64/641737cdb38c351e1c3d08b8396.jpg", discount: null }
         ];
 
         window.onload = function() {
