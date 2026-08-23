@@ -90,18 +90,18 @@
     <script>
         // Полный актуальный список товаров с вашими ссылками
         let defaultProducts = [
-            { id: 1201, name: "БАДАМ КЫЛЫЧ", price: 1100, oldPrice: null, volume: "1кг", image: "https://main-cdn.sbermegamarket.ru/hlr-system/197/804/913/412/162/227/100045556831b0.jpg", discount: null },
-            { id: 1202, name: "БАДАМ", price: 950, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=5c1901513848890e5de829a06832a3b0_l-5888430-images-thumbs&ref=rim&n=13&w=1000&h=1340", discount: null },
-            { id: 1203, name: "ФИСТАШКА", price: 1300, oldPrice: null, volume: "1кг", image: "https://smakata.by/upload/iblock/b81/n7l0sk7cnlx6l9iq5dath7ccm3vlrs8g.jpg", discount: null },
-            { id: 1204, name: "ЖЕР ЖАНГАК", price: 240, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/get-mpic/5315102/img_id8777522960749910184.jpeg/orig", discount: null },
-            { id: 1205, name: "АРАХИС СОЛЕНЫЙ", price: 350, oldPrice: null, volume: "1кг", image: "https://static.insales-cdn.com/images/articles/1/7430/3906822/arahis-rgeaaagaaaa.jpg", discount: null },
-            { id: 1206, name: "ИЗЮМ", price: 600, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/get-goods_pic/8280790/hat4ebf493ea5ccd4f8bc6e989ff09ad4da/orig", discount: null },
-            { id: 1207, name: "КЕШЬЮ", price: 950, oldPrice: null, volume: "1кг", image: "https://fruktlain.ru/upload/iblock/1d6/10q4t9200xti1vm327e1oq88oz0owno0.jpg", discount: null },
-            { id: 1208, name: "КЕШЬЮ ОЧИШЕНЫЙ", price: 950, oldPrice: null, volume: "1кг", image: "https://www.deloks.ru/upload/iblock/cb2/ts63xtx6zj896017wwygoo5nd1du5t4f/keshyu_seeberger_200_g_3_full.jpg", discount: null },
-            { id: 1209, name: "ТЫКВЕНЫЕ СЕМЕНА", price: 430, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/get-mpic/12569700/2a0000018cdb7807cce0118f2bc258623551/orig", discount: null },
-            { id: 1210, name: "ФУНДУК", price: 650, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=c16af50c674b8973637d7c191fc9776c_l-5717840-images-thumbs&n=13", discount: null },
-            { id: 1211, name: "ФИНИК (Элитный)", price: 950, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/get-mpic/4742551/img_id8405468891921363511.jpeg/orig", discount: null },
-            { id: 1212, name: "ФИНИК", price: 250, oldPrice: null, volume: "1кг", image: "https://avatars.mds.yandex.net/i?id=1d4e7801911bb54af5bc29b047a431c4_l-5618265-images-thumbs&n=13", discount: null }
+            { id: 1201, name: "БАДАМ КЫЛЫЧ", price: 550, oldPrice: null, volume: "0,5кг", image: "https://main-cdn.sbermegamarket.ru/hlr-system/197/804/913/412/162/227/100045556831b0.jpg", discount: null },
+            { id: 1202, name: "БАДАМ", price: 475, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=5c1901513848890e5de829a06832a3b0_l-5888430-images-thumbs&ref=rim&n=13&w=1000&h=1340", discount: null },
+            { id: 1203, name: "ФИСТАШКА", price: 650, oldPrice: null, volume: "0,5кг", image: "https://smakata.by/upload/iblock/b81/n7l0sk7cnlx6l9iq5dath7ccm3vlrs8g.jpg", discount: null },
+            { id: 1204, name: "ЖЕР ЖАНГАК", price: 120, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/get-mpic/5315102/img_id8777522960749910184.jpeg/orig", discount: null },
+            { id: 1205, name: "АРАХИС СОЛЕНЫЙ", price: 175, oldPrice: null, volume: "0,5кг", image: "https://static.insales-cdn.com/images/articles/1/7430/3906822/arahis-rgeaaagaaaa.jpg", discount: null },
+            { id: 1206, name: "ИЗЮМ", price: 325, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/get-goods_pic/8280790/hat4ebf493ea5ccd4f8bc6e989ff09ad4da/orig", discount: null },
+            { id: 1207, name: "КЕШЬЮ", price: 475, oldPrice: null, volume: "0,5кг", image: "https://fruktlain.ru/upload/iblock/1d6/10q4t9200xti1vm327e1oq88oz0owno0.jpg", discount: null },
+            { id: 1208, name: "КЕШЬЮ ОЧИШЕНЫЙ", price: 475, oldPrice: null, volume: "0,5кг", image: "https://www.deloks.ru/upload/iblock/cb2/ts63xtx6zj896017wwygoo5nd1du5t4f/keshyu_seeberger_200_g_3_full.jpg", discount: null },
+            { id: 1209, name: "ТЫКВЕНЫЕ СЕМЕНА", price: 215, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/get-mpic/12569700/2a0000018cdb7807cce0118f2bc258623551/orig", discount: null },
+            { id: 1210, name: "ФУНДУК", price: 325, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/i?id=c16af50c674b8973637d7c191fc9776c_l-5717840-images-thumbs&n=13", discount: null },
+            { id: 1211, name: "ФИНИК (Элитный)", price: 475, oldPrice: null, volume: "0,5кг", image: "https://avatars.mds.yandex.net/get-mpic/4742551/img_id8405468891921363511.jpeg/orig", discount: null },
+            { id: 1212, name: "ФИНИК", price: 125, oldPrice: null, volume: "0.5кг", image: "https://avatars.mds.yandex.net/i?id=1d4e7801911bb54af5bc29b047a431c4_l-5618265-images-thumbs&n=13", discount: null }
         ];
 
         let products = JSON.parse(localStorage.getItem('shop_products_suhofrukty')) || defaultProducts;
